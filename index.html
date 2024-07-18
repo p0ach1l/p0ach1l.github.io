@@ -278,6 +278,494 @@
     </article>
   </div>
 
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
+          绕过保护之Canary
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
+        <div>
+          初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:21" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
+          not_the_same_3dsctf_2016
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
+        <div>
+          not_the_same_3dsctf_2016查看保护就不说了 IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞偏移为45，这个是根据gdb的cyclic算出来的发现后门函数get_secret，功能是把flag读取赋值给fl4g初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g 方法一 通过栈溢出调用后门函数12345
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:18" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/mprotect/">#mprotect</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" target="_self">
+          用动态链接动态泄露system地址并利用
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" target="_self">
+        <div>
+          已知libc库的情况在动态编译的程序中，如果没有对system函数的直接调用，在plt中就不会存在system函数，也就是不能直接知道system函数的地址在解决动态编译的二进制文件之前，需要了解动态链接的基础知识，这个过程叫作lzy-binding。程序对外部函数的调用要求在生成可执行文件时将外部函数链接到程序中链接的方式分为静态链接和动态链接。静态链接得到的可执行文件包含外部函数的全部代码。动
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:17" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+          编写多个函数的ROP链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+        <div>
+          我们已经学会了编写单个和两个简单函数的ROP链，在这里我们说一下，编写ROP链多个需要注意的问题之前我们在学习两个函数的ROP时，编写了这样的payload我们当时没有考虑，参数冲突和栈溢出大小，现在我们来说一说举个例子，如果我们上次学习的两个函数的ROP中没有gets函数，而是read函数我们怎么办，read函数有三个参数，如果我们要像以前一样构建payload，那么read的第二个参数，就会和
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:15" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+          编写两个函数的ROP链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+        <div>
+          学会了编写单个ROP链，今天就进阶一下，学编写俩个函数的ROP链。通过一道例题我们直接上手 例题：https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2libc2首先我们查看保护 IDA反编译发现栈溢出但是没发现&#x2F;bin&#x2F;sh,这是我们就无从下手了，我们要想一个办法创造&#x2F;bin&#x2F;sh这个字符串，我们发现
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:13" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+          编写单个函数的ROP链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+        <div>
+          什么是ROP链在我初识栈溢出那篇博客已经详细的讲了函数的调用过程（基于X86框架），不了解的可以看一下，没有这个理论基础，是学不好ROP的。现在我们说一下什么是ROP。 ROP链就是通过返回地址的修改来完成的编程，调用特定的函数的一种编程模式。我们可以联想一下你做的最简单的栈溢出的题，返回地址覆盖system（&#x2F;bin&#x2F;sh）。这种也是一种ROP链，只是最简单的一种，所以说RO
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:09" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/Shellcode/" target="_self">
+          Shellcode
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/Shellcode/" target="_self">
+        <div>
+          什么是ShellcodeShellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行 怎么生成ShellcodeShellcode的生成方法通常有以下几种：  在pwntools中由shellcr
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:06" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA/" target="_self">
+          初识栈溢出
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA/" target="_self">
+        <div>
+          认识栈结构栈这种结构学过数据结构的都知道，是一种先进后出的结构，类似于子弹放进弹夹一样，先放进的子弹最后打出。 函数调用过程这个知识是整个栈方面的关键知识，我在大一的时候学pwn怎么也学不会，就是忽略了对基础知识的学习，直接学漏洞，一直搞不清怎么回事，非常郁闷。现在详细总结一下函数调用过程，以X86系统为例  压入参数根据调用约定压入参数，main函数作为调用者，首先将fun的参数a,b…压栈。栈
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:03" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
 
 
 

