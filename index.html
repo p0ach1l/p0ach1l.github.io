@@ -251,6 +251,67 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
+          通过 realloc_hook 调整栈帧使 onegadget 生效
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
+        <div>
+          前言在某些堆的题目当中，由于限制只能使用 house of spirit 等方法劫持 malloc_hook ，这种情况一般是往 malloc_hook 写入 onegadget ，再次申请堆来 getshell 。 由于栈帧情况不满足，查询到的所有 onegadget 可能都打不通，这时就可以考虑下用 malloc_hook 和 realloc_hook 结合。先通过 realloc调整栈帧，然
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-19 21:29" pubdate>
+              2024-08-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/onegadget/">#onegadget</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/08/03/wustctf2020-closed/" target="_self">
           wustctf2020_closed
         </a>
@@ -751,67 +812,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2024-07-18 16:17" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-          编写多个函数的ROP链
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-        <div>
-          我们已经学会了编写单个和两个简单函数的ROP链，在这里我们说一下，编写ROP链多个需要注意的问题之前我们在学习两个函数的ROP时，编写了这样的payload我们当时没有考虑，参数冲突和栈溢出大小，现在我们来说一说举个例子，如果我们上次学习的两个函数的ROP中没有gets函数，而是read函数我们怎么办，read函数有三个参数，如果我们要像以前一样构建payload，那么read的第二个参数，就会和
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:15" pubdate>
               2024-07-18
             </time>
           </div>
