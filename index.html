@@ -251,6 +251,39 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/10/12/text/" target="_self">
+          text
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/12/text/" target="_self">
+        <div>
+          
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-12 12:58" pubdate>
+              2024-10-12
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/09/28/%E6%9B%B4%E6%8D%A2libc%E4%B8%9D%E6%BB%91%E5%B0%8F%E8%BF%9E%E6%8B%9B/" target="_self">
           更换libc丝滑小连招
         </a>
@@ -784,67 +817,6 @@
 
           </div>
         
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
-          绕过保护之Canary
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
-        <div>
-          初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:21" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
         
       </div>
     </article>
