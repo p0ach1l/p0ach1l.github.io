@@ -4,13 +4,25 @@
   
   
   <entry>
-    <title>text</title>
-    <link href="/2024/10/12/text/"/>
-    <url>/2024/10/12/text/</url>
+    <title>docker配置心得</title>
+    <link href="/2024/10/21/docker%E9%85%8D%E7%BD%AE%E5%BF%83%E5%BE%97/"/>
+    <url>/2024/10/21/docker%E9%85%8D%E7%BD%AE%E5%BF%83%E5%BE%97/</url>
     
-    <content type="html"><![CDATA[]]></content>
+    <content type="html"><![CDATA[<h2 id="下载docker"><a href="#下载docker" class="headerlink" title="下载docker"></a>下载docker</h2><p>docker下载现在比较方便直接用官方shell脚本一键部署</p><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs stata">curl -fsSL https:<span class="hljs-comment">//test.docker.com -o test-docker.sh</span><br>sudo <span class="hljs-keyword">sh</span> <span class="hljs-keyword">test</span>-docker.<span class="hljs-keyword">sh</span><br></code></pre></td></tr></table></figure><h2 id="配置docker"><a href="#配置docker" class="headerlink" title="配置docker"></a>配置docker</h2><p>安装好后需要添加当前用户到docker组中，重启生效</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> usermod -aG docker <span class="hljs-variable">$USER</span><br><span class="hljs-built_in">groups</span> <span class="hljs-comment">#检查当前用户组</span><br></code></pre></td></tr></table></figure><p>最最关键的一点是代理问题，刚开始一直在换国内的源，但是还是显示我用原始的源下载，因为以前都是换源后行了，突然报错，研究了一上午，最后发现配置个代理ok了，不换源配置代理，反而更快</p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#123;<br>  <span class="hljs-string">&quot;proxies&quot;</span><span class="hljs-punctuation">:</span> &#123;<br>    <span class="hljs-string">&quot;http-proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://192.168.15.236:7890&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-string">&quot;https-proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://192.168.15.236:7890&quot;</span><br>  &#125;<br>&#125;<br><span class="hljs-meta">#更换为自己的ip和端口</span><br></code></pre></td></tr></table></figure>]]></content>
     
     
+    <categories>
+      
+      <category>杂记</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
+      
+    </tags>
     
   </entry>
   
