@@ -24,7 +24,7 @@
 <meta property="og:description" content="下载dockerdocker下载现在比较方便直接用官方shell脚本一键部署 12curl -fsSL https:&#x2F;&#x2F;test.docker.com -o test-docker.shsudo sh test-docker.sh  配置docker安装好后需要添加当前用户到docker组中，重启生效 12sudo usermod -aG docker $USERgroups #检查当前用户组">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-21T04:14:31.000Z">
-<meta property="article:modified_time" content="2024-10-21T04:23:57.394Z">
+<meta property="article:modified_time" content="2024-10-22T06:31:38.686Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="docker">
 <meta name="twitter:card" content="summary_large_image">
@@ -247,7 +247,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          184 字
+          975 字
         
       </span>
     
@@ -258,7 +258,7 @@
         
         
         
-          2 分钟
+          9 分钟
         
       </span>
     
@@ -309,6 +309,18 @@
 <p>最最关键的一点是代理问题，刚开始一直在换国内的源，但是还是显示我用原始的源下载，因为以前都是换源后行了，突然报错，研究了一上午，最后发现配置个代理ok了，不换源配置代理，反而更快</p>
 <figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">&#123;<br>  <span class="hljs-string">&quot;proxies&quot;</span><span class="hljs-punctuation">:</span> &#123;<br>    <span class="hljs-string">&quot;http-proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://192.168.15.236:7890&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-string">&quot;https-proxy&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://192.168.15.236:7890&quot;</span><br>  &#125;<br>&#125;<br><span class="hljs-meta">#更换为自己的ip和端口</span><br></code></pre></td></tr></table></figure>
 
+<h2 id="docker使用简单命令"><a href="#docker使用简单命令" class="headerlink" title="docker使用简单命令"></a>docker使用简单命令</h2><h3 id="容器生命周期管理"><a href="#容器生命周期管理" class="headerlink" title="容器生命周期管理"></a>容器生命周期管理</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">run - 创建并启动一个新的容器。<br>start/stop/restart - 这些命令主要用于启动、停止和重启容器。<br><span class="hljs-built_in">kill</span> - 立即终止一个或多个正在运行的容器<br><span class="hljs-built_in">rm</span> - 于删除一个或多个已经停止的容器。<br>pause/unpause - 暂停和恢复容器中的所有进程。<br>create - 创建一个新的容器，但不会启动它。<br><span class="hljs-built_in">exec</span> - 在运行中的容器内执行一个新的命令。<br>rename - 重命名容器。<br></code></pre></td></tr></table></figure>
+
+<h3 id="容器操作"><a href="#容器操作" class="headerlink" title="容器操作"></a>容器操作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">ps - 列出 Docker 容器<br>inspect - 获取 Docker 对象（容器、镜像、卷、网络等）的详细信息。<br>top - 显示指定容器中的正在运行的进程。<br>attach - 允许用户附加到正在运行的容器并与其交互。<br>events - 获取 Docker 守护进程生成的事件。<br>logs - 获取和查看容器的日志输出。<br><span class="hljs-built_in">wait</span> - 允许用户等待容器停止并获取其退出代码。<br><span class="hljs-built_in">export</span> - 将容器的文件系统导出为 tar 归档文件。<br>port - 显示容器的端口映射信息。<br>stats - 实时显示 Docker 容器的资源使用情况。<br>容器的root文件系统（rootfs）命令<br>commit - 允许用户将容器的当前状态保存为新的 Docker 镜像。<br><span class="hljs-built_in">cp</span> - 用于在容器和宿主机之间复制文件或目录。<br>diff - 显示 Docker 容器文件系统的变更。<br></code></pre></td></tr></table></figure>
+
+<h3 id="镜像仓库"><a href="#镜像仓库" class="headerlink" title="镜像仓库"></a>镜像仓库</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">login</span>/logout - 管理 Docker 客户端与 Docker 注册表的身份验证。<br>pull - 从 Docker 注册表（例如 Docker Hub）中拉取（下载）镜像到本地。<br>push - 将本地构建的 Docker 镜像推送（上传）到 Docker 注册表（如 Docker Hub 或私有注册表）。<br><span class="hljs-keyword">search</span> - 用于在 Docker Hub 或其他注册表中搜索镜像。<br></code></pre></td></tr></table></figure>
+
+<h3 id="本地镜像管理"><a href="#本地镜像管理" class="headerlink" title="本地镜像管理"></a>本地镜像管理</h3><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">images - 列出本地的 Docker 镜像。<br>rmi - 删除不再需要的镜像。<br>tag - 创建本地镜像的别名（tag）。<br>build - 从 Dockerfile 构建 Docker 镜像。<br>history - 查看指定镜像的历史层信息。<br>save - 将一个或多个 Docker 镜像保存到一个 tar 归档文件中。<br><span class="hljs-keyword">load</span> - 从由 docker save 命令生成的 tar 文件中加载 Docker 镜像。<br><span class="hljs-keyword">import</span> - 从一个 tar 文件或 URL 导入容器快照，从而创建一个新的 Docker 镜像。<br><span class="hljs-keyword">info</span>|<span class="hljs-keyword">version</span><br><span class="hljs-keyword">info</span> - 显示 Docker 的系统级信息，包括当前的镜像和容器数量。<br><span class="hljs-keyword">version</span> - 显示 Docker 客户端和服务端的版本信息。<br>Docker Compose<br>docker compose run - 启动一个新容器并运行一个特定的应用程序。<br>docker compose rm - 启动一个新容器并删除一个特定的应用程序。<br>docker compose ps - 从 docker compose 检查 docker 容器状态。<br>docker compose build - 构建 docker compose 文件。<br>docker compose up - 运行 docker compose 文件。<br>docker compose ls - 列出 docker compose 服务。<br>docker compose <span class="hljs-keyword">start</span> - 启动 docker compose 文件创建的容器。<br>docker compose <span class="hljs-keyword">restart</span> - 重启 docker compose 文件创建的容器。<br></code></pre></td></tr></table></figure>
+
+<h3 id="网络命令"><a href="#网络命令" class="headerlink" title="网络命令"></a>网络命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs \">docker network ls: 列出所有网络。<br>docker network create &lt;network&gt;: 创建一个新的网络。<br>docker network rm &lt;network&gt;: 删除指定的网络。<br>docker network connect &lt;network&gt; &lt;container&gt;: 连接容器到网络。<br>docker network disconnect &lt;network&gt; &lt;container&gt;: 断开容器与网络的连接。<br>详细内容查看：docker network 命令<br></code></pre></td></tr></table></figure>
+
+<h3 id="卷命令"><a href="#卷命令" class="headerlink" title="卷命令"></a>卷命令</h3><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs gauss">docker <span class="hljs-built_in">volume</span> ls: 列出所有卷。<br>docker <span class="hljs-built_in">volume</span> <span class="hljs-keyword">create</span> &lt;<span class="hljs-built_in">volume</span>&gt;: 创建一个新的卷。<br>docker <span class="hljs-built_in">volume</span> rm &lt;<span class="hljs-built_in">volume</span>&gt;: 删除指定的卷。<br>docker <span class="hljs-built_in">volume</span> inspect &lt;<span class="hljs-built_in">volume</span>&gt;: 显示卷的详细信息。<br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
@@ -355,6 +367,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2024/10/22/%E2%AD%90off-by-null%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95%E2%AD%90/" title="⭐off-by-null利用手法⭐">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">⭐off-by-null利用手法⭐</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
