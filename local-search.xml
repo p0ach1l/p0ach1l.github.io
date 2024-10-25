@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>newstar刷题笔记</title>
+    <link href="/2024/10/25/newstar%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/"/>
+    <url>/2024/10/25/newstar%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="My-GBC"><a href="#My-GBC" class="headerlink" title="My_GBC!!!!!"></a>My_GBC!!!!!</h2><p>本题收获：</p><p>学会了循环位移加密算法，需要注意的是一个对一个字节的操作</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">ror</span>(<span class="hljs-params">val , n</span>) :<br>  <span class="hljs-keyword">return</span> ((val &gt;&gt; n) | (val &lt;&lt; (<span class="hljs-number">8</span> - n))) &amp; <span class="hljs-number">0xff</span><br></code></pre></td></tr></table></figure><h2 id="不思議なscanf"><a href="#不思議なscanf" class="headerlink" title="不思議なscanf"></a>不思議なscanf</h2><p>本题收获：</p><p>scanf<code>时使用的参数</code>%d</p><p>正常输入时，输入为范围在 [−231,232−1] 内的整数。</p><p>如果输入范围在 [−263,263−1] 内的整数，则会截断高位读取，此范围是 <code>long long int</code> 的范围。</p><p>如果输入范围在 <code>long long int</code> 范围之外，则统一将参数赋值为 −1（0xFFFFFFFF）</p><p>如果输入为非数字，分为下列情况：</p><ol><li>如果输入仅有一个，则该输入无效，该值不变；</li><li>如果输入有数字前缀（如 <code>12345abcd</code>），则 <code>scanf</code> 仅会读取前面的数字，从第一个非数字开始，后面全部舍弃（<code>12345</code>）；</li><li>如果输入有多个且使用一个 <code>scanf</code> 语句（如 <code>scanf(&quot;%d, %d&quot;, &amp;a, &amp;b)</code>），输入第一个非数字后，后面的所有输入均为无效，前面的输入可以赋值；</li><li>如果输入有多个且使用多个 <code>scanf</code> 语句（含循环，即一个 <code>scanf</code> 中仅有一个输入），则输入非数字时，如果输入的不是 <code>+</code> 或 <code>-</code>，则后面紧跟的所有 <code>scanf</code> 均自动跳过，变为无效，不能输入。如果输入的 <code>+</code> 或 <code>-</code>，则会跳过当前输入，后面仍然可以进行输入。</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>刷题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>newstar_pwn</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>手搓shellcoe初级奥义</title>
     <link href="/2024/10/24/%E6%89%8B%E6%90%93shellcoe%E5%88%9D%E7%BA%A7%E5%A5%A5%E4%B9%89/"/>
     <url>/2024/10/24/%E6%89%8B%E6%90%93shellcoe%E5%88%9D%E7%BA%A7%E5%A5%A5%E4%B9%89/</url>
