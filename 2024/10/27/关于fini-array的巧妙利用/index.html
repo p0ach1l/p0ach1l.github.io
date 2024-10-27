@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="文件启动之ELF经常调试的朋友都知道，main函数其实不是程序的起点。程序的启动流程依次为 _start --&gt; __libc_start_main --&gt; main __libc_start_main分析对应_start的代码，可以发现__libc_start_main函数的参数中，有3个是函数指针：  rdi &lt;- main rcx &lt;- __libc_csu_init">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于fini_array的巧妙利用">
+<meta property="og:url" content="http://example.com/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="文件启动之ELF经常调试的朋友都知道，main函数其实不是程序的起点。程序的启动流程依次为 _start --&gt; __libc_start_main --&gt; main __libc_start_main分析对应_start的代码，可以发现__libc_start_main函数的参数中，有3个是函数指针：  rdi &lt;- main rcx &lt;- __libc_csu_init">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-27T08:28:06.000Z">
+<meta property="article:modified_time" content="2024-10-27T09:28:23.850Z">
+<meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="fini_array">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>关于fini_array的巧妙利用 - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="关于fini_array的巧妙利用"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-27 16:28" pubdate>
+          2024年10月27日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          821 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">关于fini_array的巧妙利用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="文件启动之ELF"><a href="#文件启动之ELF" class="headerlink" title="文件启动之ELF"></a>文件启动之ELF</h2><p>经常调试的朋友都知道，main函数其实不是程序的起点。程序的启动流程依次为</p>
+<p><code>_start --&gt; __libc_start_main --&gt; main</code></p>
+<h2 id="libc-start-main分析"><a href="#libc-start-main分析" class="headerlink" title="__libc_start_main分析"></a>__libc_start_main分析</h2><p>对应<code>_start</code>的代码，可以发现<code>__libc_start_main</code>函数的参数中，有3个是函数指针：</p>
+<ul>
+<li><code>rdi</code> &lt;- <code>main</code></li>
+<li><code>rcx</code> &lt;- <code>__libc_csu_init</code></li>
+<li><code>r8</code> &lt;- <code>__libc_csu_fini</code></li>
+</ul>
+<p>不难想到，除<code>main</code>以外的这两位兄弟，一位在<code>main</code>开始执行前执行，一位在<code>main</code>执行完毕后执行</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs x86asm">pwndbg&gt; x/20i <span class="hljs-number">0x402bd0</span><br>   <span class="hljs-number">0x402bd0</span> &lt;__libc_csu_fini&gt;:	<span class="hljs-keyword">push</span>   <span class="hljs-built_in">rbp</span><br>   <span class="hljs-number">0x402bd1</span> &lt;__libc_csu_fini+<span class="hljs-number">1</span>&gt;:	<span class="hljs-keyword">lea</span>    <span class="hljs-built_in">rax</span>,[<span class="hljs-built_in">rip</span>+<span class="hljs-number">0xb24e8</span>]        # <span class="hljs-number">0x4b50c0</span> <br>   <span class="hljs-number">0x402bd8</span> &lt;__libc_csu_fini+<span class="hljs-number">8</span>&gt;:	<span class="hljs-keyword">lea</span>    <span class="hljs-built_in">rbp</span>,[<span class="hljs-built_in">rip</span>+<span class="hljs-number">0xb24d1</span>]        # <span class="hljs-number">0x4b50b0</span> <br>   <span class="hljs-number">0x402bdf</span> &lt;__libc_csu_fini+<span class="hljs-number">15</span>&gt;:	<span class="hljs-keyword">push</span>   <span class="hljs-built_in">rbx</span><br>   <span class="hljs-number">0x402be0</span> &lt;__libc_csu_fini+<span class="hljs-number">16</span>&gt;:	<span class="hljs-keyword">sub</span>    <span class="hljs-built_in">rax</span>,<span class="hljs-built_in">rbp</span><br>   <span class="hljs-number">0x402be3</span> &lt;__libc_csu_fini+<span class="hljs-number">19</span>&gt;:	<span class="hljs-keyword">sub</span>    <span class="hljs-built_in">rsp</span>,<span class="hljs-number">0x8</span><br>   <span class="hljs-number">0x402be7</span> &lt;__libc_csu_fini+<span class="hljs-number">23</span>&gt;:	<span class="hljs-keyword">sar</span>    <span class="hljs-built_in">rax</span>,<span class="hljs-number">0x3</span><br>   <span class="hljs-number">0x402beb</span> &lt;__libc_csu_fini+<span class="hljs-number">27</span>&gt;:	<span class="hljs-keyword">je</span>     <span class="hljs-number">0x402c06</span> &lt;__libc_csu_fini+<span class="hljs-number">54</span>&gt;<br>   <span class="hljs-number">0x402bed</span> &lt;__libc_csu_fini+<span class="hljs-number">29</span>&gt;:	<span class="hljs-keyword">lea</span>    <span class="hljs-built_in">rbx</span>,[<span class="hljs-built_in">rax</span>-<span class="hljs-number">0x1</span>]<br>   <span class="hljs-number">0x402bf1</span> &lt;__libc_csu_fini+<span class="hljs-number">33</span>&gt;:	<span class="hljs-keyword">nop</span>    <span class="hljs-built_in">DWORD</span> <span class="hljs-built_in">PTR</span> [<span class="hljs-built_in">rax</span>+<span class="hljs-number">0x0</span>]<br>   <span class="hljs-number">0x402bf8</span> &lt;__libc_csu_fini+<span class="hljs-number">40</span>&gt;:	<span class="hljs-keyword">call</span>   <span class="hljs-built_in">QWORD</span> <span class="hljs-built_in">PTR</span> [<span class="hljs-built_in">rbp</span>+<span class="hljs-built_in">rbx</span>*<span class="hljs-number">8</span>+<span class="hljs-number">0x0</span>]<br>   <span class="hljs-number">0x402bfc</span> &lt;__libc_csu_fini+<span class="hljs-number">44</span>&gt;:	<span class="hljs-keyword">sub</span>    <span class="hljs-built_in">rbx</span>,<span class="hljs-number">0x1</span><br>   <span class="hljs-number">0x402c00</span> &lt;__libc_csu_fini+<span class="hljs-number">48</span>&gt;:	<span class="hljs-keyword">cmp</span>    <span class="hljs-built_in">rbx</span>,<span class="hljs-number">0xffffffffffffffff</span><br>   <span class="hljs-number">0x402c04</span> &lt;__libc_csu_fini+<span class="hljs-number">52</span>&gt;:	<span class="hljs-keyword">jne</span>    <span class="hljs-number">0x402bf8</span> &lt;__libc_csu_fini+<span class="hljs-number">40</span>&gt;<br>   <span class="hljs-number">0x402c06</span> &lt;__libc_csu_fini+<span class="hljs-number">54</span>&gt;:	<span class="hljs-keyword">add</span>    <span class="hljs-built_in">rsp</span>,<span class="hljs-number">0x8</span><br>   <span class="hljs-number">0x402c0a</span> &lt;__libc_csu_fini+<span class="hljs-number">58</span>&gt;:	<span class="hljs-keyword">pop</span>    <span class="hljs-built_in">rbx</span><br>   <span class="hljs-number">0x402c0b</span> &lt;__libc_csu_fini+<span class="hljs-number">59</span>&gt;:	<span class="hljs-keyword">pop</span>    <span class="hljs-built_in">rbp</span><br>   <span class="hljs-number">0x402c0c</span> &lt;__libc_csu_fini+<span class="hljs-number">60</span>&gt;:	<span class="hljs-keyword">jmp</span>    <span class="hljs-number">0x48f52c</span> &lt;_fini&gt;<br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="利用方式-栈迁移"><a href="#利用方式-栈迁移" class="headerlink" title="利用方式 - 栈迁移"></a>利用方式 - 栈迁移</h3><p>首先，看下面这条指令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0x402bd8</span>: lea rbp,[rip+<span class="hljs-number">0xb24d1</span>] # <span class="hljs-number">0x4b50b0</span><br><span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>rbp = 0x4b50b0</code>，<code>0x4b50b0</code>是<code>fini_array</code>的首地址</p>
+</blockquote>
+<p>这条指令相当于<code>lea rbp,[fini_array]</code>，因此，在这里配合<code>gadget</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c">leave ; (mov rsp,ebp; pop rbp)<br>ret<br><span class="hljs-number">12</span><br></code></pre></td></tr></table></figure>
+
+<p>便可以把__栈迁移__到<code>fini_array</code>（<code>fini_array</code>存储的函数指针，可能有__写权限__）</p>
+<h3 id="利用方式-控制流劫持"><a href="#利用方式-控制流劫持" class="headerlink" title="利用方式 - 控制流劫持"></a>利用方式 - 控制流劫持</h3><p>下面还有一条<code>call</code>指令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-number">0x402bf8</span>: call QWORD PTR [rbp+rbx*<span class="hljs-number">8</span>]<br><span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>rbp</code>即为<code>fini_array</code>，因此这里将调用<code>fini_array</code>中的函数</p>
+</blockquote>
+<p>只要修改<code>fini_array</code>中的值，就可以实现__控制流的转移__啦（传说中的<code>fini_array</code>劫持）</p>
+<p>这里分析的64位的静态编译程序，可见其中的<code>__libc_csu_fini</code>函数简直好用的不得了鸭，既可以完成__栈迁移__，又能够劫持__控制流__</p>
+<blockquote>
+<p>动态链接的程序<code>__libc_csu_fini</code>很短，并没有上述指令…但是也有类似fini_array的函数指针</p>
+</blockquote>
+<h2 id="fini-array分析"><a href="#fini-array分析" class="headerlink" title="fini_array分析"></a>fini_array分析</h2><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs x86asm">pwndbg&gt; elfheader <br><span class="hljs-number">0x400200</span> - <span class="hljs-number">0x400224</span>  .note<span class="hljs-number">.</span>gnu<span class="hljs-number">.</span>build-id<br><span class="hljs-number">0x400224</span> - <span class="hljs-number">0x400244</span>  .note<span class="hljs-number">.</span>ABI-tag<br><span class="hljs-number">0x400248</span> - <span class="hljs-number">0x400470</span>  .rela<span class="hljs-number">.</span>plt<br><span class="hljs-number">0x401000</span> - <span class="hljs-number">0x401017</span>  .init<br><span class="hljs-number">0x401018</span> - <span class="hljs-number">0x4010d0</span>  .plt<br><span class="hljs-number">0x4010d0</span> - <span class="hljs-number">0x48d630</span>  .text<br><span class="hljs-number">0x48d630</span> - <span class="hljs-number">0x48f52b</span>  __libc_freeres_fn<br><span class="hljs-number">0x48f52c</span> - <span class="hljs-number">0x48f535</span>  .fini<br><span class="hljs-number">0x490000</span> - <span class="hljs-number">0x4a95dc</span>  .rodata<br><span class="hljs-number">0x4a95dc</span> - <span class="hljs-number">0x4a95dd</span>  .stapsdt<span class="hljs-number">.</span>base<br><span class="hljs-number">0x4a95e0</span> - <span class="hljs-number">0x4b3d00</span>  .eh_frame<br><span class="hljs-number">0x4b3d00</span> - <span class="hljs-number">0x4b3da9</span>  .gcc_except_table<br><span class="hljs-number">0x4b5080</span> - <span class="hljs-number">0x4b50a0</span>  .tdata<br><span class="hljs-number">0x4b50a0</span> - <span class="hljs-number">0x4b50b0</span>  .init_array<br><span class="hljs-number">0x4b50a0</span> - <span class="hljs-number">0x4b50e0</span>  .tbss<br><span class="hljs-number">0x4b50b0</span> - <span class="hljs-number">0x4b50c0</span>  .fini_array<br><span class="hljs-number">0x4b50c0</span> - <span class="hljs-number">0x4b7ef4</span>  .data<span class="hljs-number">.</span><span class="hljs-built_in">rel</span><span class="hljs-number">.</span>ro<br><span class="hljs-number">0x4b7ef8</span> - <span class="hljs-number">0x4b7fe8</span>  .got<br><span class="hljs-number">0x4b8000</span> - <span class="hljs-number">0x4b80d0</span>  .got<span class="hljs-number">.</span>plt<br><span class="hljs-number">0x4b80e0</span> - <span class="hljs-number">0x4b9bf0</span>  .data<br><span class="hljs-number">0x4b9bf0</span> - <span class="hljs-number">0x4b9c38</span>  __libc_subfreeres<br><span class="hljs-number">0x4b9c40</span> - <span class="hljs-number">0x4ba2e8</span>  __libc_IO_vtables<br><span class="hljs-number">0x4ba2e8</span> - <span class="hljs-number">0x4ba2f0</span>  __libc_atexit<br><span class="hljs-number">0x4ba300</span> - <span class="hljs-number">0x4bba78</span>  .bss<br><span class="hljs-number">0x4bba78</span> - <span class="hljs-number">0x4bbaa0</span>  __libc_freeres_ptrs<br></code></pre></td></tr></table></figure>
+
+<p>其中<code>0x4b50b0 - 0x4b50c0</code>即<code>.fini_array</code>数组，其中存在两个函数指针：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">pwndbg&gt; x/<span class="hljs-number">2</span>xg <span class="hljs-number">0x4b50b0</span><br><span class="hljs-number">0x4b50b0</span>:	<span class="hljs-number">0x0000000000401b10</span>	<span class="hljs-number">0x0000000000401580</span><br>pwndbg&gt; x/i <span class="hljs-number">0x0000000000401b10</span><br>   <span class="hljs-number">0x401b10</span> &lt;__do_global_dtors_aux&gt;:	cmp    BYTE PTR [rip+<span class="hljs-number">0xb87e9</span>],<span class="hljs-number">0x0</span><br>pwndbg&gt; x/i <span class="hljs-number">0x0000000000401580</span><br>   <span class="hljs-number">0x401580</span> &lt;fini&gt;:	mov    rax,QWORD PTR [rip+<span class="hljs-number">0xb9b71</span>]<br><span class="hljs-number">123456</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">array[<span class="hljs-number">0</span>]`-&gt;`__do_global_dtors_aux`<br>`array[<span class="hljs-number">1</span>]`-&gt;`fini<br></code></pre></td></tr></table></figure>
+</blockquote>
+<p>这两个函数都会在<code>main</code>执行完毕后执行，因此只要__覆盖这两个函数指针，即可实现控制流的劫持__</p>
+<blockquote>
+<p>此外，静态链接的程序也有<code>PLT</code>表和<code>GOT</code>表，也可以覆盖通过<code>GOT</code>中的函数指针实现控制流劫持</p>
+</blockquote>
+<p>上述<code>fini_array</code>中的两个函数指针在<code>__libc_csu_fini</code>（上文说的那位兄弟）中被执行</p>
+<p><strong>执行的顺序是<code>array[1]-&gt;array[0]</code></strong>(后有详解)</p>
+<h2 id="一种好玩儿的利用方式"><a href="#一种好玩儿的利用方式" class="headerlink" title="一种好玩儿的利用方式"></a>一种好玩儿的利用方式</h2><h3 id="循环大法"><a href="#循环大法" class="headerlink" title="循环大法"></a>循环大法</h3><p>一种比较好玩儿的操作：</p>
+<ul>
+<li>把<code>array[0]</code>的值覆盖为那位兄弟（<code>__libc_csu_fini</code>函数）的地址</li>
+<li>把<code>array[1]</code>的值覆盖为另一个函数地址，就叫他<code>addrA</code>吧</li>
+</ul>
+<p>于是，<code>main</code>执行完毕后执行<code>__libc_csu_fini</code>，于是有意思的来了！</p>
+<ul>
+<li><code>__libc_csu_fini</code>先执行一遍<code>array[1]:addrA</code>，返回后再执行<code>array[0]:__libc_csu_fini</code></li>
+<li><code>__libc_csu_fini</code>先执行一遍<code>array[1]:addrA</code>，返回后再执行<code>array[0]:__libc_csu_fini</code></li>
+<li><code>__libc_csu_fini</code>先执行一遍<code>array[1]:addrA</code>，返回后再执行<code>array[0]:__libc_csu_fini</code></li>
+<li>…</li>
+</ul>
+<p>看！连起来啦~ <code>main</code>-&gt;<code>__libc_csu_fini</code>-&gt;<code>addrA</code>-&gt;<code>__libc_csu_fini</code>-&gt;<code>addrA</code>-&gt; <code>......</code></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/" class="category-chain-item">函数利用</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/fini-array/" class="print-no-link">#fini_array</a>
+      
+    </div>
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/25/newstar%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" title="newstar刷题笔记">
+                        <span class="hidden-mobile">newstar刷题笔记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>TKYmax</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
