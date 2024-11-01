@@ -251,6 +251,128 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/" target="_self">
+          强网杯2023_ezfmt复现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/" target="_self">
+        <div>
+          2023强网杯ez_fmt序言：明天要打强网杯了，特意找了一点以前的题写写，发现这高质量比赛的题真是开阔视野了，收获不少。 解题思路IDA反编译一下看一下伪代码，第一眼看上去真是简单题呀，但是以开始写脚本发现十分的不对劲，只有一个格式化字符串漏洞，而且利用过后不能通过fini_array实现无限利用。  思考很久都没有思路，上网查看了大佬的wp才恍然大悟。也彻底颠覆了我对控制函数返回地址的理解。
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-01 20:19" pubdate>
+              2024-11-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%88%B7%E9%A2%98/" class="category-chain-item">刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%BC%BA%E7%BD%91%E6%9D%AF2023/">#强网杯2023</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/" target="_self">
+          高级ROP之SROP
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/" target="_self">
+        <div>
+          signal机制signal 机制是类 unix 系统中进程之间相互传递信息的一种方法。一般，我们也称其为软中断信号，或者软中断。比如说，进程之间可以通过系统调用 kill 来发送软中断信号。一般来说，信号机制常见的步骤如下图所示：   内核向某个进程发送 signal 机制，该进程会被暂时挂起，进入内核态。  进入内核前为了恢复进程需要保存上下文，主要是把所有寄存器压入栈中，以及压入signal
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-28 19:53" pubdate>
+              2024-10-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/SROP/">#SROP</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/" target="_self">
           关于fini_array的巧妙利用
         </a>
@@ -649,7 +771,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  <a href="/categories/%E6%9D%82%E8%AE%B0/" class="category-chain-item">杂记</a>
   
   
 
@@ -726,130 +848,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/House-of-Orange/">#House of Orange</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
-          通过 realloc_hook 调整栈帧使 onegadget 生效
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
-        <div>
-          前言在某些堆的题目当中，由于限制只能使用 house of spirit 等方法劫持 malloc_hook ，这种情况一般是往 malloc_hook 写入 onegadget ，再次申请堆来 getshell 。 由于栈帧情况不满足，查询到的所有 onegadget 可能都打不通，这时就可以考虑下用 malloc_hook 和 realloc_hook 结合。先通过 realloc调整栈帧，然
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-19 21:29" pubdate>
-              2024-08-19
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/onegadget/">#onegadget</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/03/wustctf2020-closed/" target="_self">
-          wustctf2020_closed
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/03/wustctf2020-closed/" target="_self">
-        <div>
-          IDA反编译伪代码 文件相关知识这题就是一个Linux命令 exec 1&gt;&amp;0 现在来解释一下  close(1);close(2); 我们的目的是要得到shell，官方wp给的是此处可以输入串：$0然后可以执行新的命令exec 1&gt;&amp;0以及其他以查看到flag 那么这条语句是什么意思呢？其中的0和1是指什么呢？ 0和1是linux下的文件描述符。 在Linux中一切皆
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-03 18:02" pubdate>
-              2024-08-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Linux%E5%91%BD%E4%BB%A4/">#Linux命令</a>
-            
-              <a href="/tags/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">#文件操作</a>
             
           </div>
         

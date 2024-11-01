@@ -251,6 +251,128 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+          编写多个函数的ROP链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+        <div>
+          我们已经学会了编写单个和两个简单函数的ROP链，在这里我们说一下，编写ROP链多个需要注意的问题之前我们在学习两个函数的ROP时，编写了这样的payload我们当时没有考虑，参数冲突和栈溢出大小，现在我们来说一说举个例子，如果我们上次学习的两个函数的ROP中没有gets函数，而是read函数我们怎么办，read函数有三个参数，如果我们要像以前一样构建payload，那么read的第二个参数，就会和
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:15" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+          编写两个函数的ROP链
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
+        <div>
+          学会了编写单个ROP链，今天就进阶一下，学编写俩个函数的ROP链。通过一道例题我们直接上手 例题：附件下载首先我们查看保护 IDA反编译发现栈溢出但是没发现&#x2F;bin&#x2F;sh,这是我们就无从下手了，我们要想一个办法创造&#x2F;bin&#x2F;sh这个字符串，我们发现题目有gets函数，那么我们能不能通过gets输入&#x2F;bin&#x2F;sh这个字符串呢，我们来验证一下
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:13" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
           编写单个函数的ROP链
         </a>
@@ -283,7 +405,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
   
   
 
@@ -344,7 +466,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
   
   
 
@@ -405,7 +527,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/PWN/" class="category-chain-item">PWN</a>
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
   
   
 
