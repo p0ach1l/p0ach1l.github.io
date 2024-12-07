@@ -4,11 +4,11 @@
   
   
   <entry>
-    <title>pwn之初体验</title>
-    <link href="/2024/11/27/pwn%E4%B9%8B%E5%88%9D%E4%BD%93%E9%AA%8C/"/>
-    <url>/2024/11/27/pwn%E4%B9%8B%E5%88%9D%E4%BD%93%E9%AA%8C/</url>
+    <title>IO_FILE结构体认识和利用</title>
+    <link href="/2024/12/07/IO-FILE%E7%BB%93%E6%9E%84%E4%BD%93%E8%AE%A4%E8%AF%86%E5%92%8C%E5%88%A9%E7%94%A8/"/>
+    <url>/2024/12/07/IO-FILE%E7%BB%93%E6%9E%84%E4%BD%93%E8%AE%A4%E8%AF%86%E5%92%8C%E5%88%A9%E7%94%A8/</url>
     
-    <content type="html"><![CDATA[<h2 id="pwn做题流程"><a href="#pwn做题流程" class="headerlink" title="pwn做题流程"></a>pwn做题流程</h2><h3 id="ida反编译静态分析找漏洞"><a href="#ida反编译静态分析找漏洞" class="headerlink" title="ida反编译静态分析找漏洞"></a>ida反编译静态分析找漏洞</h3><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture/test/202411271924333.png" alt="image-20241127192428254"></p><p>经过分析距离栈底rbp为0x20个字节</p><h3 id="找到shell拿去flag"><a href="#找到shell拿去flag" class="headerlink" title="找到shell拿去flag"></a>找到shell拿去flag</h3><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture/test/202411271927444.png" alt="image-20241127192706371"></p><h3 id="编写脚本攻击服务器"><a href="#编写脚本攻击服务器" class="headerlink" title="编写脚本攻击服务器"></a>编写脚本攻击服务器</h3>]]></content>
+    <content type="html"><![CDATA[]]></content>
     
     
     
