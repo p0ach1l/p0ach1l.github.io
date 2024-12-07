@@ -251,6 +251,67 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/10/22/%E2%AD%90off-by-null%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95%E2%AD%90/" target="_self">
+          ⭐off-by-null利用手法⭐
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/22/%E2%AD%90off-by-null%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95%E2%AD%90/" target="_self">
+        <div>
+          off-by-null利用手法关于堆块的构造一般情况下使用两头大中间小的构造，因为这样可以堆块重叠去fastbin攻击，当然特殊情况特殊对待。 下面讲解一下构造过程 申请五个堆块 12345add(0x100 , b&#x27;aaaa&#x27;) #0add(0x30 , b&#x27;ccc&#x27;) #1add(0x68 , b&#x27;dddd&#x27;) #2add(0xf0
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-22 19:31" pubdate>
+              2024-10-22
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/off-by-null/">#off-by-null</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/10/21/docker%E9%85%8D%E7%BD%AE%E5%BF%83%E5%BE%97/" target="_self">
           docker配置心得
         </a>
@@ -791,60 +852,6 @@
               <a href="/tags/UAF/">#UAF</a>
             
           </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
-          一次艰难的堆探索
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
-        <div>
-          堆的认识初始堆 是虚拟地址空间的的 一块连续的线性区域 提供动态分配的内存，允许程序申请大小未知的内存 在用户与操作系统之间，作为动态内存管理的中间人 响应用户的申请内存请求， 向操作系统申请内存，然后将其返回给用户程序 管理用户所释放的内存，适 时归还给操作系统    堆区域为Data上边，增长方向为低地址到高地址  shared libraries也是堆区域  申请内存的系统调用  对于主线程
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-26 19:59" pubdate>
-              2024-07-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
         
       </div>
     </article>
