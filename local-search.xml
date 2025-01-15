@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>手脱UPX壳不求人教程</title>
+    <link href="/2025/01/15/%E6%89%8B%E8%84%B1UPX%E5%A3%B3%E4%B8%8D%E6%B1%82%E4%BA%BA%E6%95%99%E7%A8%8B/"/>
+    <url>/2025/01/15/%E6%89%8B%E8%84%B1UPX%E5%A3%B3%E4%B8%8D%E6%B1%82%E4%BA%BA%E6%95%99%E7%A8%8B/</url>
+    
+    <content type="html"><![CDATA[<h1 id="手脱UPX壳不求人教程"><a href="#手脱UPX壳不求人教程" class="headerlink" title="手脱UPX壳不求人教程"></a>手脱UPX壳不求人教程</h1><p>小白：“为什么要手脱UPX壳呀？upx -d　不香吗？”<br>高手：“香个蛋，出题人各个心里阴暗，能给你upx -d的机会不多了。”</p><h2 id="ESP定律"><a href="#ESP定律" class="headerlink" title="ESP定律"></a>ESP定律</h2><p>个人认为这个方法是最方便，最快捷的，掌握这个方法基本的UPX壳闭眼脱</p><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>ESP 定律的原理在于利用程序中堆栈平衡来快速找到 OEP.</p><p>由于在程序自解密或者自解压过程中, 不少壳会先将当前寄存器状态压栈, 如使用<code>pushad</code>, 在解压结束后, 会将之前的寄存器值出栈, 如使用<code>popad</code>. 因此在寄存器出栈时, 往往程序代码被恢复, 此时硬件断点触发. 然后在程序当前位置, 只需要少许单步操作, 就很容易到达正确的 OEP 位置.</p><ol><li>程序刚载入开始 pushad&#x2F;pushfd</li><li>将第一个寄存器压入栈后就设对 ESP 寄存器设硬件断点</li><li>运行程序, 触发断点，这是upx程序几乎结束</li></ol><h3 id="例题讲解"><a href="#例题讲解" class="headerlink" title="例题讲解"></a>例题讲解</h3><p>ida反编译一个加upx壳的发现函数很少，但是可以发现，start函数开始有很多push操作</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115225432603.png" alt="image-20250115225432603"></p><p>打开x64dbg进行调试，指向到第二个push停止</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115225742755.png" alt="image-20250115225742755"></p><p>然后再右下栈窗口给esp下硬件访问断点，64位8字节，32位4字节</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115225858495.png" alt="image-20250115225858495"></p><p>接下来直接运行，就会断在upx壳快结束的位置</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115230107554.png" alt="image-20250115230107554"></p><p>接着一直往下运行，直到一个大的跳转，就是到达OEP</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115230300395.png" alt="image-20250115230300395"></p><p>到达OEP后就用x64dbg自带的插件进行dump和IAT的修复</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115230506018.png" alt="image-20250115230506018"></p><p>在第四步的时候，如果出现红色×就删除掉</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115230603184.png" alt="image-20250115230603184"></p><p>上边步骤已经完成了dump和IAT的修复，但是可能程序仍然不能运行</p><p>这时候我们就要去除重定位</p><p>我们需要修改其PE结构中的两个字段值：</p><ol><li>File Header 的 Charateristics</li><li>Optional Header的 DllCharateristics</li></ol><p>下面用小辣椒(CFF Explorer VII)进行修复</p><p>第三步勾选上</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115231709951.png" alt="image-20250115231709951"></p><p>第三步取消勾选</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115231854920.png" alt="image-20250115231854920"></p><p>这样一个完整的脱壳流程就完成了</p><p>可能需要自己找到main函数😭</p><p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250115232224281.png" alt="image-20250115232224281"></p><blockquote><p>其他脱壳方法待补充。。。。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Reverse</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>手脱UPX壳</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>花指令透彻分析</title>
     <link href="/2025/01/15/%E8%8A%B1%E6%8C%87%E4%BB%A4%E9%80%8F%E5%BD%BB%E5%88%86%E6%9E%90/"/>
     <url>/2025/01/15/%E8%8A%B1%E6%8C%87%E4%BB%A4%E9%80%8F%E5%BD%BB%E5%88%86%E6%9E%90/</url>
