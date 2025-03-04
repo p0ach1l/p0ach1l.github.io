@@ -24,10 +24,10 @@
 <meta property="og:description" content="基础介绍​	首先我们来介绍一下什么是mips，MIPS架构是一种采取 精简指令集（RISC）的处理器架构，1981年出现，由MIPS科技公司开发并授权，它是基于一种固定长度的定期编码指令集，并采用 导入&#x2F;存储（Load&#x2F;Store）数据模型。经改进，这种架构可支持高级语言的优化执行。其算术和逻辑运算采用三个操作数的形式，允许编译器优化复杂的表达式。 ​	如今基于该架构的芯片广泛">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250304180828333.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20250304183115538.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250304183115538.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250304183320297.png">
 <meta property="article:published_time" content="2025-03-04T09:32:17.000Z">
-<meta property="article:modified_time" content="2025-03-04T10:41:54.856Z">
+<meta property="article:modified_time" content="2025-03-04T10:44:57.145Z">
 <meta property="article:author" content="TKYmax">
 <meta property="article:tag" content="MIPS">
 <meta name="twitter:card" content="summary_large_image">
@@ -318,7 +318,7 @@
 <p>然后我们就能模拟运行这个mips框架的elf文件了</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">qemu-mips64el-static -L /usr/mips64el-linux-gnuabi64 ./test_mipsel_64<br></code></pre></td></tr></table></figure>
 
-<p><img src="C:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20250304183115538.png" srcset="/img/loading.gif" lazyload alt="image-20250304183115538"></p>
+<p><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250304183115538.png" srcset="/img/loading.gif" lazyload alt="image-20250304183115538"></p>
 <p>这里的<code>-L /usr/mips-linux-gnu/</code>指向MIPS库的位置，根据具体环境可能需要调整。这里是默认的位置，当然如果你的并不可以，那可以选择使用如下的语句来寻找</p>
 <figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs glsl">dpkg -L libc6-mipsel-<span class="hljs-built_in">cross</span><br></code></pre></td></tr></table></figure>
 
