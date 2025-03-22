@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>非栈上格式化字符串漏洞利用</title>
+    <link href="/2025/03/22/%E9%9D%9E%E6%A0%88%E4%B8%8A%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/"/>
+    <url>/2025/03/22/%E9%9D%9E%E6%A0%88%E4%B8%8A%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/</url>
+    
+    <content type="html"><![CDATA[<h1 id="非栈上格式化字符串漏洞"><a href="#非栈上格式化字符串漏洞" class="headerlink" title="非栈上格式化字符串漏洞"></a>非栈上格式化字符串漏洞</h1><p>非栈上格式化字符串漏洞对于任意地址读取还是一样的，但是对于任意地址写就变化很大了。</p><p>我们只要利用ebp链来进行任意地址写，下面用一个例题说明</p><p><a href="https://files.buuoj.cn/files/b89c9875750eb5e534b0d8b13e174531/xman_2019_format">附件地址</a></p><p>题目漏洞点如下</p><p><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250322212208905.png" alt="image-20250322212208905"></p><p>但是前面的格式化字符串储存在堆上，我们就不能用常规的栈上格式化字符串进行任意地址写，需要找一个中间介质</p><p><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250322212745163.png" alt="image-20250322212745163"></p><p>我们只需利用链1把C的地址改为目标地址，然后用利用链2就可以改目标地址的值了。</p><p><a href="https://blog.csdn.net/zzq487782568/article/details/122972488">参考wp</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>格式化字符串</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>非栈上格式化字符串</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>stdout泄露libc</title>
     <link href="/2025/03/19/stdout%E6%B3%84%E9%9C%B2libc/"/>
     <url>/2025/03/19/stdout%E6%B3%84%E9%9C%B2libc/</url>
