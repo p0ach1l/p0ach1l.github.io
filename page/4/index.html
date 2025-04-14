@@ -251,6 +251,489 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/08/03/wustctf2020-closed/" target="_self">
+          wustctf2020_closed
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/03/wustctf2020-closed/" target="_self">
+        <div>
+          IDA反编译伪代码 文件相关知识这题就是一个Linux命令 exec 1&gt;&amp;0 现在来解释一下  close(1);close(2); 我们的目的是要得到shell，官方wp给的是此处可以输入串：$0然后可以执行新的命令exec 1&gt;&amp;0以及其他以查看到flag 那么这条语句是什么意思呢？其中的0和1是指什么呢？ 0和1是linux下的文件描述符。 在Linux中一切皆
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-03 18:02" pubdate>
+              2024-08-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Linux%E5%91%BD%E4%BB%A4/">#Linux命令</a>
+            
+              <a href="/tags/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">#文件操作</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/08/03/Fastbin-Attack/" target="_self">
+          Fastbin Attack
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/03/Fastbin-Attack/" target="_self">
+        <div>
+          介绍fastbin attack 是一类漏洞的利用方法，是指所有基于 fastbin 机制的漏洞利用方法。这类利用的前提是：  存在堆溢出、UAF等能控制chunk内容的漏洞 漏洞发生于fastbin类型的chunk中  fastbin attack大致可以分为一下几类：  Fastbin Double Free House of Spirit Alloc to Stack Arbitrary A
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-03 15:08" pubdate>
+              2024-08-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Fastbin-Attack/">#Fastbin Attack</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/08/02/House-of-Spirit%E6%94%BB%E5%87%BB/" target="_self">
+          House of Spirit攻击
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/02/House-of-Spirit%E6%94%BB%E5%87%BB/" target="_self">
+        <div>
+          原理House of Spirit是一种堆利用方法，其核心在于通过任意地址的释放达到篡改地址的目的。 利用条件：  在目标地址周围能够伪造一个堆块。 能对伪造堆块地址周围进行一次释放（即将伪造的堆块地址作为free函数的参数进行一次释放操作） 释放之后能够重新申请得到这个堆块并篡改目标地址的内容  这里给出一个POC代码如下： 12345678910111213141516171819202122
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-02 20:46" pubdate>
+              2024-08-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/House-of-Spirit/">#House of Spirit</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/08/01/House-of-Force%E6%94%BB%E5%87%BB/" target="_self">
+          House of Force攻击
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/01/House-of-Force%E6%94%BB%E5%87%BB/" target="_self">
+        <div>
+          原理House Of Force 是一种堆利用方法，但是并不是说 House Of Force 必须得基于堆漏洞来进行利用。如果一个堆 (heap based) 漏洞想要通过 House Of Force 方法进行利用，需要以下条件：  能够以溢出等方式控制到 top chunk 的 size 域 能够自由地控制堆分配尺寸的大小  House Of Force 产生的原因在于 glibc 对 to
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-01 17:05" pubdate>
+              2024-08-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/House-of-Force/">#House-of-Force</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/08/01/UAF%E6%BC%8F%E6%B4%9E/" target="_self">
+          UAF漏洞
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/01/UAF%E6%BC%8F%E6%B4%9E/" target="_self">
+        <div>
+          什么是UAFUAF就是Use After Free，简单来说就是释放后再次被使用，分为一下几种情况：  内存块被释放后，其对应的指针被设置为 NULL ， 然后再次使用，自然程序会崩溃。 内存块被释放后，其对应的指针没有被设置为 NULL ，然后在它下一次被使用之前，没有代码对这块内存块进行修改，那么程序很有可能可以正常运转。 内存块被释放后，其对应的指针没有被设置为 NULL，但是在它下一次使用
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-01 15:47" pubdate>
+              2024-08-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/UAF/">#UAF</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
+          一次艰难的堆探索
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
+        <div>
+          堆的认识初始堆 是虚拟地址空间的的 一块连续的线性区域 提供动态分配的内存，允许程序申请大小未知的内存 在用户与操作系统之间，作为动态内存管理的中间人 响应用户的申请内存请求， 向操作系统申请内存，然后将其返回给用户程序 管理用户所释放的内存，适 时归还给操作系统    堆区域为Data上边，增长方向为低地址到高地址  shared libraries也是堆区域  申请内存的系统调用  对于主线程
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-26 19:59" pubdate>
+              2024-07-26
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
+          绕过保护之Canary
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
+        <div>
+          初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:21" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%A0%88/">#栈</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
+          not_the_same_3dsctf_2016
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
+        <div>
+          not_the_same_3dsctf_2016查看保护就不说了 IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞偏移为45，这个是根据gdb的cyclic算出来的发现后门函数get_secret，功能是把flag读取赋值给fl4g初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g 方法一 通过栈溢出调用后门函数12345
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-18 16:18" pubdate>
+              2024-07-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/mprotect/">#mprotect</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" target="_self">
           用动态链接动态泄露system地址并利用
         </a>
@@ -367,255 +850,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-          编写两个函数的ROP链
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E4%B8%A4%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-        <div>
-          学会了编写单个ROP链，今天就进阶一下，学编写俩个函数的ROP链。通过一道例题我们直接上手 例题：附件下载首先我们查看保护 IDA反编译发现栈溢出但是没发现&#x2F;bin&#x2F;sh,这是我们就无从下手了，我们要想一个办法创造&#x2F;bin&#x2F;sh这个字符串，我们发现题目有gets函数，那么我们能不能通过gets输入&#x2F;bin&#x2F;sh这个字符串呢，我们来验证一下
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:13" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-          编写单个函数的ROP链
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%8D%95%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-        <div>
-          什么是ROP链在我初识栈溢出那篇博客已经详细的讲了函数的调用过程（基于X86框架），不了解的可以看一下，没有这个理论基础，是学不好ROP的。现在我们说一下什么是ROP。 ROP链就是通过返回地址的修改来完成的编程，调用特定的函数的一种编程模式。我们可以联想一下你做的最简单的栈溢出的题，返回地址覆盖system（&#x2F;bin&#x2F;sh）。这种也是一种ROP链，只是最简单的一种，所以说RO
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:09" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/Shellcode/" target="_self">
-          Shellcode
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/Shellcode/" target="_self">
-        <div>
-          什么是ShellcodeShellcode指的是用来完成某个功能的汇编代码，常用的功能就是获取目标系统的shell。在栈溢出的基础上，我们一般都是向栈中写内容，所以要想执行Shellcode，就要要求对应的二进制文件没有开启NX保护。利用ret_address返回Shellcode处执行 怎么生成ShellcodeShellcode的生成方法通常有以下几种：  在pwntools中由shellcr
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:06" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA/" target="_self">
-          初识栈溢出
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E5%88%9D%E8%AF%86%E6%A0%88%E6%BA%A2%E5%87%BA/" target="_self">
-        <div>
-          认识栈结构栈这种结构学过数据结构的都知道，是一种先进后出的结构，类似于子弹放进弹夹一样，先放进的子弹最后打出。 函数调用过程这个知识是整个栈方面的关键知识，我在大一的时候学pwn怎么也学不会，就是忽略了对基础知识的学习，直接学漏洞，一直搞不清怎么回事，非常郁闷。现在详细总结一下函数调用过程，以X86系统为例  压入参数根据调用约定压入参数，main函数作为调用者，首先将fun的参数a,b…压栈。栈
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:03" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span>
+      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/#board">5</a><a class="extend next" rel="next" href="/page/5/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
