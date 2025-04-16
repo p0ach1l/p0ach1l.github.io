@@ -251,6 +251,128 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/09/12/House-of-Orange/" target="_self">
+          House of Orange
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/09/12/House-of-Orange/" target="_self">
+        <div>
+          概述House of Orange 的利用比较特殊，首先需要目标漏洞是堆上的漏洞但是特殊之处在于题目中不存在 free 函数或其他释放堆块的函数。我们知道一般想要利用堆漏洞，需要对堆块进行 malloc 和 free 操作，但是在 House of Orange 利用中无法使用 free 函数，因此 House of Orange 核心就是通过漏洞利用获得 free 的效果。 原理如我们前面所述，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-12 20:40" pubdate>
+              2024-09-12
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/House-of-Orange/">#House of Orange</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
+          通过 realloc_hook 调整栈帧使 onegadget 生效
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
+        <div>
+          前言在某些堆的题目当中，由于限制只能使用 house of spirit 等方法劫持 malloc_hook ，这种情况一般是往 malloc_hook 写入 onegadget ，再次申请堆来 getshell 。 由于栈帧情况不满足，查询到的所有 onegadget 可能都打不通，这时就可以考虑下用 malloc_hook 和 realloc_hook 结合。先通过 realloc调整栈帧，然
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-19 21:29" pubdate>
+              2024-08-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/onegadget/">#onegadget</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/08/03/wustctf2020-closed/" target="_self">
           wustctf2020_closed
         </a>
@@ -721,128 +843,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/mprotect/">#mprotect</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" target="_self">
-          用动态链接动态泄露system地址并利用
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%94%A8%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%8A%A8%E6%80%81%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%E5%B9%B6%E5%88%A9%E7%94%A8/" target="_self">
-        <div>
-          已知libc库的情况在动态编译的程序中，如果没有对system函数的直接调用，在plt中就不会存在system函数，也就是不能直接知道system函数的地址在解决动态编译的二进制文件之前，需要了解动态链接的基础知识，这个过程叫作lzy-binding。程序对外部函数的调用要求在生成可执行文件时将外部函数链接到程序中链接的方式分为静态链接和动态链接。静态链接得到的可执行文件包含外部函数的全部代码。动
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:17" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-          编写多个函数的ROP链
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BC%96%E5%86%99%E5%A4%9A%E4%B8%AA%E5%87%BD%E6%95%B0%E7%9A%84ROP%E9%93%BE/" target="_self">
-        <div>
-          我们已经学会了编写单个和两个简单函数的ROP链，在这里我们说一下，编写ROP链多个需要注意的问题之前我们在学习两个函数的ROP时，编写了这样的payload我们当时没有考虑，参数冲突和栈溢出大小，现在我们来说一说举个例子，如果我们上次学习的两个函数的ROP中没有gets函数，而是read函数我们怎么办，read函数有三个参数，如果我们要像以前一样构建payload，那么read的第二个参数，就会和
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:15" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
             
           </div>
         

